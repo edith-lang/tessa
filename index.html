@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TESSA — the LaTeX studio that fixes your errors</title>
+<meta name="description" content="TESSA is a free, offline LaTeX studio for Windows. It explains and fixes errors in one click, lets you drag things right on the PDF, and keeps every file on your computer.">
+<meta property="og:title" content="TESSA — Stop debugging. Start writing.">
+<meta property="og:description" content="A free, offline LaTeX studio that fixes your errors and lets you drag things right on the PDF.">
+<meta property="og:image" content="assets/og.png">
+<meta name="theme-color" content="#0b0c1a">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a dark indigo night sky. 3D mosaic hero, then alternating feature rows with tilted screenshots, video, downloads. */
+:root {
+  --bg: #0b0c1a; --bg2: #111329; --card: #161936; --line: #262a52; --ink: #eef0fb; --muted: #a3a8c8; --faint: #6e739a;
+  --indigo: #5a47d6; --cyan: #8fe3ff; --ok: #57d7a1;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); overflow-x: hidden; }
+a { color: var(--cyan); }
+img { max-width: 100%; height: auto; display: block; } /* height:auto keeps the width/height attributes from stretching images */
+[hidden] { display: none !important; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+
+/* nav */
+nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: color-mix(in srgb, var(--bg) 72%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+nav .wrap { display: flex; align-items: center; gap: 22px; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 800 21px var(--display); letter-spacing: 1.5px; }
+.brand img { width: 30px; height: 30px; }
+nav .links { display: flex; gap: 22px; margin-left: auto; }
+nav .links a { color: var(--muted); text-decoration: none; font-size: 15px; }
+nav .links a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 14px; font: 600 16px var(--body); text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .15s, box-shadow .2s, background .2s; }
+.btn.primary { background: linear-gradient(135deg, #7d6bff, var(--indigo)); color: #fff; box-shadow: 0 10px 30px -10px #6a55ff; }
+.btn.primary:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -10px #6a55ff; }
+.btn.ghost { border-color: var(--line); color: var(--ink); background: color-mix(in srgb, var(--card) 70%, transparent); }
+.btn.ghost:hover { border-color: var(--cyan); }
+.btn.sm { padding: 9px 16px; font-size: 14.5px; border-radius: 11px; }
+
+/* hero */
+.hero { position: relative; min-height: min(860px, 100svh); display: grid; align-items: center; overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: -20% -10% auto; height: 120%; background: radial-gradient(50% 45% at 72% 40%, #3b2f9e66, transparent 70%), radial-gradient(35% 35% at 15% 20%, #1d6d8a44, transparent 70%); pointer-events: none; }
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero .wrap { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 30px; width: 100%; pointer-events: none; }
+.hero .copy { pointer-events: auto; padding-block: 60px; }
+.eyebrow { font: 500 13px var(--mono); letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); }
+h1 { font: 800 clamp(44px, 7vw, 86px)/0.98 var(--display); letter-spacing: -2.5px; margin: 14px 0 22px; text-wrap: balance; }
+h1 em { font-style: normal; background: linear-gradient(100deg, var(--cyan), #b9a8ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lead { font-size: 19.5px; color: var(--muted); max-width: 34ch; margin: 0 0 30px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.cta small { display: block; width: 100%; color: var(--faint); font-size: 13.5px; margin-top: 6px; }
+.fallback-logo { position: absolute; right: 8%; top: 50%; width: min(36vw, 380px); transform: translateY(-50%); opacity: .95; }
+
+/* trust strip */
+.strip { border-block: 1px solid var(--line); background: var(--bg2); }
+.strip .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding-block: 22px; }
+.strip div { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 15px; }
+.strip b { color: var(--ink); font-weight: 600; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 12px var(--ok); }
+
+/* features */
+section { padding-block: 84px; }
+.sec-head { max-width: 680px; margin-bottom: 50px; }
+h2 { font: 800 clamp(32px, 4.4vw, 52px)/1.05 var(--display); letter-spacing: -1.4px; margin: 10px 0 14px; text-wrap: balance; }
+.sec-head p { color: var(--muted); margin: 0; font-size: 18.5px; }
+.feature { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 56px; align-items: center; margin-bottom: 72px; }
+.feature:last-child { margin-bottom: 0; }
+.feature:nth-of-type(even) { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+.feature:nth-of-type(even) .text { order: 2; }
+.feature h3 { font: 700 clamp(26px, 3vw, 36px)/1.1 var(--display); letter-spacing: -.8px; margin: 10px 0 12px; }
+.feature p { color: var(--muted); margin: 0 0 16px; }
+.feature ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.feature li { display: flex; gap: 10px; color: var(--ink); font-size: 15.5px; }
+.feature li::before { content: ""; width: 7px; height: 7px; margin-top: 9px; border-radius: 2px; transform: rotate(45deg); background: var(--cyan); flex: none; }
+.kbd { font: 500 13px var(--mono); padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); border-bottom-width: 2px; background: var(--card); color: var(--ink); white-space: nowrap; }
+.shot { perspective: 1400px; }
+.shot .frame { border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--card); box-shadow: 0 40px 80px -30px #000, 0 0 0 1px #ffffff08 inset; transform: rotateY(-5deg) rotateX(2deg); transition: transform .5s cubic-bezier(.2,.7,.2,1); transform-style: preserve-3d; }
+.feature:nth-of-type(even) .shot .frame { transform: rotateY(5deg) rotateX(2deg); }
+.shot .bar { height: 30px; display: flex; gap: 7px; align-items: center; padding-inline: 12px; background: #0e1026; border-bottom: 1px solid var(--line); }
+.shot .bar i { width: 10px; height: 10px; border-radius: 50%; background: #2c3060; }
+.shot img { width: 100%; height: auto; }
+/* tall portrait screenshots are cropped to a landscape window so rows don't turn into tall, stretched columns */
+.shot img.crop, .card img.crop { aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% var(--y, 0%); }
+.shot { max-width: 620px; justify-self: center; width: 100%; }
+
+/* showcase */
+.showcase { padding-block: 70px 10px; perspective: 1800px; }
+.win3d { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #0e1026; box-shadow: 0 60px 120px -40px #000, 0 0 0 1px #ffffff0a inset, 0 0 80px -20px #5a47d655;
+  transform: rotateX(calc(var(--tilt, 1) * 22deg)) scale(calc(1 - var(--tilt, 1) * 0.08)); transform-origin: 50% 0; transition: transform .1s linear; }
+.win3d .bar { height: 36px; display: flex; gap: 8px; align-items: center; padding-inline: 14px; border-bottom: 1px solid var(--line); color: var(--faint); font: 500 12px var(--mono); }
+.win3d .bar i { width: 11px; height: 11px; border-radius: 50%; background: #2c3060; }
+.win3d .bar span { margin-left: 10px; }
+.win3d img { width: 100%; height: auto; }
+
+/* interactive fix demo */
+.demo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 0; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: #0e1026; margin-bottom: 84px; }
+.demo .code { padding: 26px 26px 22px; font: 15px/1.9 var(--mono); color: #c9cdf0; border-right: 1px solid var(--line); min-width: 0; overflow-x: auto; }
+.demo .ln { color: #4b5080; display: inline-block; width: 2.2em; user-select: none; }
+.demo .cmd { color: #f0a04b; } .demo .arg { color: #8fe3ff; }
+.demo .typo { text-decoration: underline wavy #ff626e; text-underline-offset: 4px; transition: color .3s; }
+.demo .fixed { color: #57d7a1; text-decoration: none; }
+.demo .problem { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: #1b1d3e; border: 1px solid #3a2f5f; font: 14px/1.55 var(--body); color: var(--muted); display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; transition: opacity .4s, transform .4s; }
+.demo .problem b { color: var(--ink); }
+.demo .problem.gone { opacity: 0; transform: translateY(6px); pointer-events: none; }
+.demo .fixbtn { margin-left: auto; padding: 8px 14px; border-radius: 10px; border: 0; background: #f0a04b; color: #1d1405; font: 600 14px var(--body); cursor: pointer; }
+.demo .fixbtn:hover { filter: brightness(1.08); }
+.demo .pdf { background: #f7f6f2; color: #1b1b1b; display: grid; place-items: center; padding: 30px; min-height: 260px; font-family: "Latin Modern Roman", "Computer Modern", Georgia, serif; text-align: center; }
+.demo .pdf .t { font-size: 28px; transition: opacity .5s; }
+.demo .pdf .a { font-size: 17px; margin-top: 10px; }
+.demo .pdf .err { font: 600 14px var(--mono); color: #c0313d; }
+.demo .reset { margin-top: 14px; background: none; border: 0; color: var(--faint); font: 13px var(--body); cursor: pointer; text-decoration: underline; padding: 0; }
+
+/* video */
+.video { background: linear-gradient(180deg, var(--bg), var(--bg2)); }
+.player { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 50px 100px -40px #000; aspect-ratio: 16 / 9; background: #070814; max-width: 100%; }
+.player video { width: 100%; height: 100%; display: block; }
+
+/* tour + setup */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 26px; min-width: 0; }
+.card h3 { font: 700 24px var(--display); margin: 0 0 8px; letter-spacing: -.4px; }
+.card p { color: var(--muted); margin: 0 0 18px; }
+.card img { border-radius: 12px; border: 1px solid var(--line); }
+
+/* privacy */
+.privacy .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.privacy .card b { display: block; font: 700 19px var(--display); margin-bottom: 4px; }
+.privacy .card span { color: var(--muted); font-size: 15px; }
+.bytes { font: 500 clamp(40px, 7vw, 76px) var(--mono); color: var(--ok); letter-spacing: -2px; margin: 0 0 6px; }
+
+/* downloads */
+.downloads { background: radial-gradient(60% 50% at 50% 0%, #2a2380aa, transparent 70%), var(--bg2); border-top: 1px solid var(--line); }
+.dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 980px; }
+.dl { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; transition: border-color .2s, transform .2s; }
+.dl.mine { border-color: var(--cyan); box-shadow: 0 0 0 3px #8fe3ff22; }
+.dl:hover { transform: translateY(-2px); }
+.dl .os { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: #0e1026; border: 1px solid var(--line); }
+.dl h3 { margin: 0; font: 700 19px var(--display); }
+.dl .meta { color: var(--faint); font-size: 13.5px; }
+.dl .tag { font: 500 11px var(--mono); color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-left: 6px; }
+details.sums { margin-top: 26px; color: var(--muted); }
+details.sums summary { cursor: pointer; color: var(--ink); }
+.sumtable { overflow-x: auto; margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.sumtable table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.sumtable td { padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.sumtable code { font-family: var(--mono); color: var(--muted); }
+.note { color: var(--faint); font-size: 14.5px; margin-top: 18px; max-width: 75ch; }
+
+/* faq */
+.faq { display: grid; gap: 12px; max-width: 860px; }
+.faq details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; }
+.faq summary { cursor: pointer; font-weight: 600; font-size: 17.5px; }
+.faq p { color: var(--muted); margin: 10px 0 0; }
+
+footer { border-top: 1px solid var(--line); padding-block: 40px 60px; color: var(--faint); font-size: 14.5px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 26px; align-items: center; }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--ink); }
+footer .email { font-family: var(--mono); color: var(--muted); user-select: all; }
+
+.reveal { opacity: 1; transform: none; transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+.js .reveal.pending { opacity: 0; transform: translateY(26px); }
+
+@media (max-width: 900px) {
+  .hero .wrap, .feature, .feature:nth-of-type(even), .duo, .dl-grid, .privacy .grid { grid-template-columns: minmax(0, 1fr); }
+  .feature:nth-of-type(even) .text { order: 0; }
+  .demo { grid-template-columns: minmax(0, 1fr); }
+  .demo .code { border-right: 0; border-bottom: 1px solid var(--line); }
+  .hero { min-height: auto; }
+  .hero .copy { padding-block: 40px 300px; }
+  /* phones: the 3D T gets its own band under the copy so flying tiles never cross the text */
+  #stage { inset: auto 0 0 0; height: 300px; }
+  .demo .pdf { min-height: 150px; padding: 22px; }
+  .strip .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  nav .links { display: none; }
+  nav .btn { margin-left: auto; }
+  section { padding-block: 80px; }
+  .feature { margin-bottom: 80px; gap: 28px; }
+  .shot .frame, .feature:nth-of-type(even) .shot .frame { transform: none; }
+  .fallback-logo { right: 50%; top: auto; bottom: 30px; transform: translateX(50%); width: 240px; }
+  .dl { grid-template-columns: auto minmax(0, 1fr); }
+  .dl .btn { grid-column: 1 / -1; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .js .reveal.pending { opacity: 1; transform: none; transition: none; }
+  .shot .frame { transition: none; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="30" height="30">TESSA</a>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#video">Watch</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a class="btn primary sm" href="#download">Download free</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <canvas id="stage" aria-hidden="true"></canvas>
+  <img class="fallback-logo" id="fallbackLogo" src="assets/logo.svg" alt="" hidden>
+  <div class="wrap">
+    <div class="copy">
+      <div class="eyebrow">Typesetting Engine for Smart Scientific Authoring</div>
+      <h1>Stop debugging.<br><em>Start writing.</em></h1>
+      <p class="lead">TESSA is a free LaTeX studio that explains and fixes your errors in one click, lets you drag things right on the PDF, and keeps every file on your computer.</p>
+      <div class="cta">
+        <a class="btn primary" id="heroDownload" href="#download">Download for Windows</a>
+        <a class="btn ghost" href="#video">Watch the 3-minute tour</a>
+        <small id="heroNote">Free · Windows 10 &amp; 11 · No account, works offline</small>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap">
+    <div><span class="dot"></span><span><b>Free</b> for any work</span></div>
+    <div><span class="dot"></span><span><b>Offline</b>: nothing uploaded</span></div>
+    <div><span class="dot"></span><span><b>No account</b> or sign-up</span></div>
+    <div><span class="dot"></span><span><b>LaTeX included</b>, nothing to install</span></div>
+  </div>
+</div>
+
+<main>
+<div class="showcase" id="showcase">
+  <div class="wrap">
+    <div class="win3d" id="win3d">
+      <div class="bar"><i></i><i></i><i></i><span>paper — TESSA</span></div>
+      <img src="assets/app.webp" alt="TESSA with a LaTeX paper on the left and the live PDF on the right" width="1920" height="1020">
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">What makes it easy</div>
+      <h2>Everything you fight with in LaTeX, handled.</h2>
+      <p>Write on the left, see the PDF on the right, and let TESSA take care of the parts that used to cost you an evening.</p>
+    </div>
+
+    <div class="demo reveal" id="demo" aria-label="Try it: fix a typo">
+      <div class="code">
+        <div><span class="ln">1</span><span class="cmd">\documentclass</span>{<span class="arg">article</span>}</div>
+        <div><span class="ln">2</span><span class="cmd typo" id="demoCmd">\titmle</span>{<span class="arg">My Report</span>}</div>
+        <div><span class="ln">3</span><span class="cmd">\author</span>{<span class="arg">Sam Rivera</span>}</div>
+        <div><span class="ln">4</span><span class="cmd">\begin</span>{<span class="arg">document</span>}</div>
+        <div><span class="ln">5</span><span class="cmd">\maketitle</span></div>
+        <div><span class="ln">6</span><span class="cmd">\end</span>{<span class="arg">document</span>}</div>
+        <div class="problem" id="demoProblem">
+          <span><b>Undefined control sequence</b> on line 2.<br><code>\titmle</code> looks like a typo of <code>\title</code>.</span>
+          <button class="fixbtn" id="demoFix" type="button">Fix: change to \title</button>
+        </div>
+        <button class="reset" id="demoReset" type="button" hidden>Break it again</button>
+      </div>
+      <div class="pdf" id="demoPdf"><div><div class="err" id="demoErr">PDF not built: 1 error</div><div class="t" id="demoTitle" hidden>My Report</div><div class="a" id="demoAuthor" hidden>Sam Rivera</div></div></div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="text">
+        <div class="eyebrow">One-click fixes</div>
+        <h3>Errors explained in plain English, then fixed.</h3>
+        <p>A typo like <code>\titmle</code> becomes <code>\title</code> with one click. A page full of errors? Press <b>Fix all</b> and TESSA repairs them and compiles again.</p>
+        <ul><li>Misspelled commands and environments</li><li>Missing packages, braces, <code>$</code> and <code>\end{…}</code></li><li>Prices like $5, 50%, # and file paths in text</li></ul>
+      </div>
+      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img class="crop" style="--y: 100%" src="assets/shot-fix.webp" alt="TESSA showing an explained error and a one-click fix" width="642" height="930" loading="lazy"></div></div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="text">
+        <div class="eyebrow">Layout mode</div>
+        <h3>Drag anything, right on the PDF.</h3>
+        <p>Press <span class="kbd">Ctrl</span> <span class="kbd">L</span> and move charts, images and text boxes where you want them on the page. TESSA rewrites the LaTeX for you.</p>
+        <ul><li>Drag, drop and resize on the page</li><li>Works in documents and Beamer slides</li></ul>
+      </div>
+      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img class="crop" style="--y: 30%" src="assets/shot-layout.webp" alt="Dragging a chart on the PDF in layout mode" width="888" height="930" loading="lazy"></div></div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="text">
+        <div class="eyebrow">Equations</div>
+        <h3>See the formula before you insert it.</h3>
+        <p>Click <b>Σ</b>, type your math and watch the preview build as you go. Inside math, shortcuts do the typing: <code>@a</code> becomes <code>\alpha</code>, <code>//</code> a fraction.</p>
+        <ul><li>Live preview and a symbol palette</li><li>Numbered, inline or aligned</li></ul>
+      </div>
+      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img class="crop" src="assets/shot-equation.webp" alt="Equation editor with live preview" width="875" height="933" loading="lazy"></div></div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="text">
+        <div class="eyebrow">Tables and lists</div>
+        <h3>Edit tables like a spreadsheet.</h3>
+        <p>Paste cells from a spreadsheet and they become a LaTeX table. Click inside any table to sort, add rows or change alignment in a grid. Select lines and press <span class="kbd">Ctrl</span> <span class="kbd">K</span> to turn them into a list.</p>
+      </div>
+      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/shot-table.webp" alt="Visual table editor" width="1025" height="509" loading="lazy"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="video" id="video">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Watch</div>
+      <h2>Three minutes. Every feature.</h2>
+      <p>No sign-up, no email. Just the app doing its thing.</p>
+    </div>
+    <div class="player reveal">
+      <video controls preload="none" poster="assets/poster.webp" playsinline>
+        <source src="assets/tessa-promo.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<section id="learn">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Made for beginners too</div>
+      <h2>Set up in a minute. Learn in ten.</h2>
+    </div>
+    <div class="duo">
+      <div class="card reveal">
+        <h3>A setup that asks you</h3>
+        <p>The first time you open TESSA it asks your name, what you write, your colours and how much help you want. Change any of it later in Settings.</p>
+        <img class="crop" src="assets/shot-setup.webp" alt="First-run setup window" width="900" height="760" loading="lazy">
+      </div>
+      <div class="card reveal">
+        <h3>An optional hands-on tour</h3>
+        <p>Fourteen short steps in a practice document: write, compile, equations, lists, tables, fixes and layout mode. TESSA notices when you've done each one.</p>
+        <img class="crop" style="--y: 20%" src="assets/shot-tour.webp" alt="Interactive tour panel" width="888" height="930" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="privacy" id="privacy">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Private by design</div>
+      <div class="bytes">0 bytes</div>
+      <h2>of your writing leave your computer.</h2>
+      <p>TESSA has no servers, no account and no analytics. It only goes online to download a LaTeX package it doesn't have yet, and never sends your documents.</p>
+    </div>
+    <div class="grid">
+      <div class="card reveal"><b>No account</b><span>Open it and start writing.</span></div>
+      <div class="card reveal"><b>Works offline</b><span>On a plane, in a lab, anywhere.</span></div>
+      <div class="card reveal"><b>Your files stay local</b><span>Projects live in your Documents folder.</span></div>
+    </div>
+    <p class="note">Read the full <a href="privacy.html">privacy policy</a>.</p>
+  </div>
+</section>
+
+<section class="downloads" id="download">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Version 3.0.0</div>
+      <h2>Download TESSA. It's free.</h2>
+      <p>For Windows 10 and 11. LaTeX comes built in; if you already have TeX Live or MiKTeX, TESSA uses them automatically.</p>
+    </div>
+    <div class="dl-grid" id="dlGrid"></div>
+    <details class="sums">
+      <summary>Verify your download (SHA-256)</summary>
+      <div class="sumtable"><table id="sumTable"></table></div>
+      <p class="note">Open a Command Prompt in your Downloads folder and run <code>certutil -hashfile TESSA-Setup-3.0.0.exe SHA256</code>. The result must match the line above.</p>
+    </details>
+    <p class="note">TESSA isn't code-signed yet, so Windows may show "Windows protected your PC" the first time. Choose <b>More info → Run anyway</b>.</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal"><div class="eyebrow">Questions</div><h2>Good to know</h2></div>
+    <div class="faq">
+      <details><summary>Is TESSA really free?</summary><p>Yes. It's free to use for personal, school and commercial writing. Everything you create belongs to you.</p></details>
+      <details><summary>Do I need to install LaTeX first?</summary><p>No. TESSA ships with its own LaTeX engine and fetches packages the first time a document needs them. TeX Live or MiKTeX are used automatically if you have them.</p></details>
+      <details><summary>Does it upload my documents?</summary><p>Never. TESSA has no servers. It only connects to download LaTeX packages it doesn't have yet, or when you look up a reference by DOI.</p></details>
+      <details><summary>Is it open source?</summary><p>No. TESSA is freeware: free to use, but it may not be modified, reverse engineered or resold. It's built on open-source components, which are listed in the <a href="notices.html">third-party notices</a>.</p></details>
+      <details><summary>Which systems does it run on?</summary><p>Windows 10 and 11, 64-bit. Use the installer, or the portable version if you can't install software on the computer.</p></details>
+      <details><summary>I'm new to LaTeX. Is it for me?</summary><p>Yes. The first-run setup tailors TESSA to beginners, and the optional 10-minute tour teaches the essentials by doing them.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Adithyan Lalu</span>
+    <a href="license.html">License</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="notices.html">Third-party notices</a>
+    <span>Contact: <span class="email">adhy092018@gmail.com</span></span>
+  </div>
+</footer>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// ---------------------------------------------------------------- downloads
+// Release files live on GitHub Releases (fast, free, and the installers are too big for the website itself).
+const RELEASE = 'https://github.com/edith-lang/tessa/releases/download/v3.0.0/';
+const FILES = [
+  { os: 'win', name: 'Windows installer', tag: 'Recommended', file: 'TESSA-Setup-3.0.0.exe', size: 101352228, sha: 'aebfb311d33a7c5f2c7c1e090588f8b2f68069df58996249e426aea1af57acfa', meta: 'Windows 10/11 · 64-bit · no admin rights needed' },
+  { os: 'win', name: 'Windows portable', file: 'TESSA-3.0.0-portable.exe', size: 101000710, sha: 'b620e762043e0fb86c1f47b3e827e1534f2591ed7629e22715f9071493afca27', meta: 'Runs without installing' },
+];
+const ICONS = {
+  win: '<svg width="22" height="22" viewBox="0 0 24 24" fill="#8fe3ff"><path d="M3 5.5l7.5-1v7H3zM11.5 4.3L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg>',
+};
+const mb = b => `${Math.round(b / 1048576)} MB`;
+const mine = 'win';
+const grid = document.getElementById('dlGrid');
+for (const f of FILES) {
+  const a = document.createElement('a');
+  a.className = `dl${f.os === mine && f.tag ? ' mine' : ''}`;
+  a.href = RELEASE + f.file;
+  a.style.textDecoration = 'none'; a.style.color = 'inherit';
+  a.innerHTML = `<span class="os">${ICONS[f.os]}</span><span><h3>${f.name}${f.tag ? `<span class="tag">${f.tag}</span>` : ''}</h3><span class="meta">${f.meta} · ${mb(f.size)}</span></span><span class="btn ghost sm">Download</span>`;
+  grid.append(a);
+}
+document.getElementById('sumTable').innerHTML = FILES.map(f => `<tr><td>${f.file}</td><td><code>${f.sha}</code></td></tr>`).join('');
+const primary = FILES.find(f => f.os === mine && f.tag);
+const hero = document.getElementById('heroDownload');
+hero.textContent = 'Download for Windows';
+hero.href = RELEASE + primary.file;
+
+// ---------------------------------------------------------------- reveal on scroll (content is visible without JS)
+document.documentElement.classList.add('js');
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove('pending'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' }) : null;
+document.querySelectorAll('.reveal').forEach(el => { if (io && el.getBoundingClientRect().top > innerHeight) { el.classList.add('pending'); io.observe(el); } });
+
+// showcase window straightens as it scrolls into view
+const win3d = document.getElementById('win3d');
+const tilt = () => { const r = win3d.getBoundingClientRect(); const p = Math.min(1, Math.max(0, (r.top - innerHeight * 0.25) / (innerHeight * 0.6))); win3d.style.setProperty('--tilt', reduce ? 0 : p.toFixed(3)); };
+addEventListener('scroll', tilt, { passive: true }); addEventListener('resize', tilt); tilt();
+
+// the fix demo
+const demo = { cmd: document.getElementById('demoCmd'), problem: document.getElementById('demoProblem'), err: document.getElementById('demoErr'), title: document.getElementById('demoTitle'), author: document.getElementById('demoAuthor'), reset: document.getElementById('demoReset') };
+document.getElementById('demoFix').addEventListener('click', () => {
+  demo.cmd.textContent = '\\title'; demo.cmd.classList.remove('typo'); demo.cmd.classList.add('fixed');
+  demo.problem.classList.add('gone');
+  demo.err.textContent = 'Compiling…';
+  setTimeout(() => { demo.err.hidden = true; demo.title.hidden = false; demo.author.hidden = false; demo.reset.hidden = false; }, 700);
+});
+demo.reset.addEventListener('click', () => {
+  demo.cmd.textContent = '\\titmle'; demo.cmd.classList.add('typo'); demo.cmd.classList.remove('fixed');
+  demo.problem.classList.remove('gone'); demo.err.hidden = false; demo.err.textContent = 'PDF not built: 1 error';
+  demo.title.hidden = true; demo.author.hidden = true; demo.reset.hidden = true;
+});
+
+// screenshots tilt toward the pointer
+if (!reduce) document.querySelectorAll('.shot').forEach(s => {
+  const f = s.querySelector('.frame'); const base = f.style.transform;
+  s.addEventListener('pointermove', e => { const r = s.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5; const y = (e.clientY - r.top) / r.height - .5; f.style.transform = `rotateY(${x * 14}deg) rotateX(${-y * 10}deg)`; });
+  s.addEventListener('pointerleave', () => { f.style.transform = base; });
+});
+</script>
+
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+// ---------------------------------------------------------------- 3D hero: the TESSA mosaic T as glass-like tiles
+import * as THREE from 'three';
+const canvas = document.getElementById('stage');
+const showFallback = () => { canvas.remove(); document.getElementById('fallbackLogo').hidden = false; };
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); } catch { showFallback(); }
+if (renderer) {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.85;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  camera.position.set(0, 0, 13);
+
+  // same construction as the logo: equilateral grid, half tiles at the edges, s = 1 unit
+  const s = 1, h = Math.sqrt(3) / 2;
+  const tris = [];
+  const tri = (row, pts, kind) => tris.push({ row, kind, pts: pts.map(([u, r]) => [u * s - 2.5, -(r * h) + 2 * h]) });
+  tri(0, [[0, 0], [0, 1], [0.5, 1]], 'h');
+  for (let k = 0; k < 5; k++) tri(0, [[k, 0], [k + 1, 0], [k + 0.5, 1]], 'd');
+  for (let k = 1; k < 5; k++) tri(0, [[k, 0], [k - 0.5, 1], [k + 0.5, 1]], 'u');
+  tri(0, [[5, 0], [4.5, 1], [5, 1]], 'h');
+  for (const row of [1, 2, 3]) {
+    const a = row, b = row + 1;
+    const set = row % 2
+      ? [[[1.5, a], [1.5, b], [2, b], 'h'], [[1.5, a], [2.5, a], [2, b], 'd'], [[2.5, a], [2, b], [3, b], 'u'], [[2.5, a], [3.5, a], [3, b], 'd'], [[3.5, a], [3, b], [3.5, b], 'h']]
+      : [[[1.5, a], [2, a], [1.5, b], 'h'], [[2, a], [1.5, b], [2.5, b], 'u'], [[2, a], [3, a], [2.5, b], 'd'], [[3, a], [2.5, b], [3.5, b], 'u'], [[3, a], [3.5, a], [3.5, b], 'h']];
+    for (const [p, q, r, kd] of set) tri(row, [p, q, r], kd);
+  }
+  const cursor = tris.findIndex(t => t.row === 3 && t.kind === 'u');
+
+  const group = new THREE.Group(); scene.add(group);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const tiles = tris.map((t, i) => {
+    const c = t.pts.reduce((acc, p) => [acc[0] + p[0] / 3, acc[1] + p[1] / 3], [0, 0]);
+    // each tile slightly smaller than its cell, so dark seams show between them like in the logo
+    const shape = new THREE.Shape(t.pts.map(([x, y]) => new THREE.Vector2((x - c[0]) * 0.86, (y - c[1]) * 0.86)));
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.34, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.045, bevelSegments: 3 });
+    geo.translate(0, 0, -0.17);
+    const light = 1 - t.row * 0.09 - ((c[0] + 2.5) / 5) * 0.18 - (t.kind === 'u' ? 0.16 : t.kind === 'h' ? 0.08 : 0);
+    const col = i === cursor ? new THREE.Color('#8fe3ff') : new THREE.Color('#4a3cc4').lerp(new THREE.Color('#f4f2ff'), Math.max(0.3, light * 0.92));
+    const mat = new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.22, metalness: 0.08, clearcoat: 1, clearcoatRoughness: 0.15, emissive: i === cursor ? new THREE.Color('#2bb6e6') : new THREE.Color('#000000'), emissiveIntensity: i === cursor ? 0.9 : 0 });
+    const m = new THREE.Mesh(geo, mat);
+    const home = new THREE.Vector3(c[0], c[1], 0);
+    const dir = new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-0.6, 1)).normalize();
+    const away = home.clone().add(dir.multiplyScalar(rnd(4, 8)));
+    const spin = new THREE.Euler(rnd(-3, 3), rnd(-3, 3), rnd(-3, 3));
+    group.add(m);
+    return { m, home, away, spin, delay: rnd(0, 0.5) };
+  });
+
+  // a field of faint triangles drifting behind
+  const dust = new THREE.Group(); scene.add(dust);
+  const dGeo = new THREE.CircleGeometry(0.06, 3);
+  for (let k = 0; k < 140; k++) {
+    const d = new THREE.Mesh(dGeo, new THREE.MeshBasicMaterial({ color: k % 5 ? '#6b63c9' : '#8fe3ff', transparent: true, opacity: rnd(0.15, 0.55) }));
+    d.position.set(rnd(-14, 14), rnd(-8, 8), rnd(-12, -2)); d.rotation.z = rnd(0, 6);
+    dust.add(d);
+  }
+
+  scene.add(new THREE.HemisphereLight('#b9b2ff', '#0d0b2a', 0.55));
+  const key = new THREE.DirectionalLight('#ffffff', 1.5); key.position.set(-4, 6, 8); scene.add(key);
+  const rim = new THREE.PointLight('#8fe3ff', 40, 30); rim.position.set(5, -3, 4); scene.add(rim);
+  const fill = new THREE.PointLight('#7d6bff', 30, 30); fill.position.set(-6, -2, 3); scene.add(fill);
+
+  const pointer = { x: 0, y: 0 }; const target = { x: 0, y: 0 };
+  addEventListener('pointermove', e => { target.x = e.clientX / innerWidth - 0.5; target.y = e.clientY / innerHeight - 0.5; });
+
+  const resize = () => {
+    const w = canvas.clientWidth, hgt = canvas.clientHeight;
+    renderer.setSize(w, hgt, false);
+    camera.aspect = w / hgt; camera.updateProjectionMatrix();
+    const narrow = w < 900;
+    const unitsPerPx = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / hgt;
+    // on phones the canvas is only the 300 px band under the copy (see CSS), so the T sits in its middle
+    group.position.set(narrow ? 0 : 3.1, 0, 0);
+    // the T is 5 units wide: on phones keep it to ~60% of the screen width
+    group.scale.setScalar(narrow ? Math.min(0.62, (w * 0.6 * unitsPerPx) / 5, (hgt * 0.75 * unitsPerPx) / 5) : 0.95);
+  };
+  addEventListener('resize', resize); resize();
+
+  const t0 = performance.now();
+  const ease = x => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
+  let visible = true;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
+  const frame = now => {
+    requestAnimationFrame(frame);
+    if (!visible) return;
+    const t = (now - t0) / 1000;
+    // tiles assemble on load, and drift apart again as the hero scrolls away
+    const scroll = Math.min(1, Math.max(0, scrollY / (canvas.clientHeight * 0.9)));
+    pointer.x += (target.x - pointer.x) * 0.05; pointer.y += (target.y - pointer.y) * 0.05;
+    for (const tl of tiles) {
+      const asm = reduce ? 1 : ease((t - 0.2 - tl.delay) / 1.6) * (1 - ease(scroll * 1.3));
+      tl.m.position.lerpVectors(tl.away, tl.home, asm);
+      tl.m.rotation.set(tl.spin.x * (1 - asm), tl.spin.y * (1 - asm), tl.spin.z * (1 - asm));
+    }
+    const idle = reduce ? 0 : Math.sin(t * 0.6) * 0.06;
+    group.rotation.y = -0.35 + pointer.x * 0.7 + idle;
+    group.rotation.x = 0.12 + pointer.y * 0.45;
+    dust.rotation.z = reduce ? 0 : t * 0.01;
+    dust.position.y = scroll * 2;
+    renderer.render(scene, camera);
+  };
+  requestAnimationFrame(frame);
+}
+</script>
+</body>
+</html>

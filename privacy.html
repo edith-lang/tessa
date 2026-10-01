@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TESSA Privacy Policy</title>
+<style>
+  :root { --bg: #fbfaf7; --fg: #1d1f24; --muted: #5d6370; --accent: #c2650a; --line: #e4e1da; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0e0f13; --fg: #eceef2; --muted: #9aa1ad; --accent: #f0a04b; --line: #272a31; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.65 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
+  h1 { font-size: 34px; margin: 0 0 4px; letter-spacing: -.5px; }
+  h2 { font-size: 21px; margin: 36px 0 8px; }
+  .meta { color: var(--muted); margin: 0 0 28px; }
+  .tldr { border-left: 4px solid var(--accent); padding: 12px 18px; background: color-mix(in srgb, var(--accent) 8%, transparent); border-radius: 0 10px 10px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  code { font-size: 14.5px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>TESSA Privacy Policy</h1>
+<p class="meta">Effective 1 October 2026 · Applies to the TESSA desktop app for Windows, including the Microsoft Store version.</p>
+
+<p class="tldr"><strong>In short:</strong> TESSA does not collect, store or send any personal information. There is no account, no sign-up, no analytics, no telemetry and no advertising. Your documents stay on your computer and are never uploaded to us or anyone else.</p>
+
+<h2>Who we are</h2>
+<p>TESSA is developed by Adithyan Lalu, an individual developer. Contact: <a href="mailto:adhy092018@gmail.com">adhy092018@gmail.com</a>.</p>
+
+<h2>Information we collect</h2>
+<p>None. TESSA has no servers of its own and does not send your documents, file names, usage data, crash reports or device identifiers anywhere.</p>
+
+<h2>What stays on your computer</h2>
+<table>
+  <tr><th>What</th><th>Where</th></tr>
+  <tr><td>Your projects and documents</td><td>Wherever you save them (default: <code>Documents\TESSA</code>)</td></tr>
+  <tr><td>Build output and file history</td><td>A <code>.tessa</code> folder inside each project</td></tr>
+  <tr><td>Settings and your personal spelling dictionary</td><td>The app's settings folder (for example <code>%APPDATA%\TESSA</code>)</td></tr>
+  <tr><td>Error logs</td><td>The app's log folder. Logs are never sent automatically; you can open the folder with <em>Open Log Folder</em> in the app menu and choose to share a log with us if you ask for support.</td></tr>
+</table>
+<p>You can delete any of this at any time by deleting the files or uninstalling the app.</p>
+
+<h2>When TESSA connects to the internet</h2>
+<p>TESSA works offline. It only uses the internet in these cases, and never to send your documents:</p>
+<table>
+  <tr><th>When</th><th>What is sent</th><th>To whom</th></tr>
+  <tr><td>A document needs a LaTeX package that is not on your computer yet (usually only the first time)</td><td>A request for the package files</td><td>The package server of the open-source <a href="https://tectonic-typesetting.github.io/">Tectonic</a> project. The content of your document is not sent.</td></tr>
+  <tr><td>You choose <em>Download common packages for offline use</em></td><td>Requests for common LaTeX packages</td><td>The Tectonic package server</td></tr>
+  <tr><td>You use <em>Import a reference</em> and type a DOI or arXiv ID</td><td>Only the DOI or arXiv ID you typed</td><td><a href="https://www.doi.org/">doi.org</a> or <a href="https://arxiv.org/">arxiv.org</a>, which return the BibTeX entry</td></tr>
+  <tr><td>You click a web link</td><td>The link is opened in your web browser</td><td>The website you clicked</td></tr>
+</table>
+<p>These services receive your IP address, as any website does, and have their own privacy policies. TESSA does not add any identifier to these requests.</p>
+
+<h2>This website</h2>
+<p>The TESSA website sets no cookies and uses no analytics or tracking. To show it, your browser contacts the web host (Vercel), Google Fonts (for the typefaces) and jsDelivr (for the 3D graphics library); downloads come from GitHub. Like any web server, these services see your IP address and keep standard access logs under their own privacy policies.</p>
+
+<h2>Children</h2>
+<p>TESSA does not collect personal information from anyone, including children.</p>
+
+<h2>Changes</h2>
+<p>If a future version changes any of the above, this page will be updated before that version is released, and the effective date at the top will change.</p>
+
+<h2>Contact</h2>
+<p>Questions about privacy: <a href="mailto:adhy092018@gmail.com">adhy092018@gmail.com</a>.</p>
+</main>
+</body>
+</html>
