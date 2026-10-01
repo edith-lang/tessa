@@ -18,7 +18,7 @@
 <link rel="preload" as="image" href="assets/app.webp">
 <style>
 /* TESSA: a night-sky indigo studio. Hook first (an error storm that gets fixed), then a 3D exploded app, a pinned
-   horizontal feature ride, before/after fix slider, video, privacy counter, downloads. Everything is readable without JS;
+   calm bento grid of features (no scroll-jacking), before/after fix slider, video, privacy counter, downloads. Everything is readable without JS;
    motion only adds on top and is switched off for prefers-reduced-motion. */
 :root {
   --bg: #07081a; --bg2: #0b0c24; --card: #11132e; --card2: #161941; --line: #262a5c; --line2: #353a7a;
@@ -41,7 +41,7 @@ code { font: 500 .9em var(--mono); color: var(--cyan); }
   background: radial-gradient(40vmax 30vmax at 20% 10%, #3b2f9e88, transparent 70%), radial-gradient(35vmax 30vmax at 85% 30%, #13698a55, transparent 70%), radial-gradient(40vmax 35vmax at 50% 95%, #4a2a9a55, transparent 70%);
   animation: drift 26s ease-in-out infinite alternate; }
 @keyframes drift { to { transform: translate3d(4vmax, -3vmax, 0) rotate(8deg); } }
-.grain { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: .06; mix-blend-mode: overlay;
+.grain { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: .035; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .glow { position: fixed; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none; z-index: -1;
   background: radial-gradient(closest-side, #7b6cff22, transparent); transform: translate3d(-999px, -999px, 0); }
@@ -61,9 +61,7 @@ nav .links a:hover { color: var(--ink); background: #ffffff0d; }
 /* buttons */
 .btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 26px; border-radius: 15px; font: 600 16px var(--body); text-decoration: none; border: 1px solid transparent; cursor: pointer; isolation: isolate; will-change: transform; }
 .btn.primary { color: #fff; background: linear-gradient(135deg, #8b7bff, #5b47f0); box-shadow: 0 14px 40px -12px #6a55ff, inset 0 1px 0 #ffffff40; }
-.btn.primary::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; z-index: -1; background: conic-gradient(from var(--a, 0deg), #8fe3ff, #7b6cff, #f0a04b, #8fe3ff); filter: blur(12px); opacity: .55; animation: spin 4s linear infinite; }
-@property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-@keyframes spin { to { --a: 360deg; } }
+.btn.primary:hover { box-shadow: 0 18px 46px -12px #7b6cff, inset 0 1px 0 #ffffff40; }
 .btn.ghost { color: var(--ink); background: #ffffff08; border-color: var(--line2); }
 .btn.ghost:hover { background: #ffffff12; }
 .btn.sm { padding: 10px 18px; font-size: 15px; border-radius: 12px; }
@@ -74,7 +72,7 @@ nav .links a:hover { color: var(--ink); background: #ffffff0d; }
 h1, h2, h3 { font-family: var(--display); margin: 0; }
 h2 { font-weight: 800; font-size: clamp(36px, 5.6vw, 76px); line-height: 1; letter-spacing: -2px; margin: 16px 0 18px; }
 .grad { background: linear-gradient(100deg, var(--cyan), var(--violet2) 55%, #ffb8d9); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hook { font: 500 clamp(17px, 1.6vw, 21px)/1.4 var(--mono); color: var(--red); margin: 0; }
+.hook { font: 500 clamp(15px, 1.4vw, 18px)/1.45 var(--mono); color: #ff9aa8; margin: 0; }
 .hook::before { content: "> "; color: var(--faint); }
 .lead { color: var(--muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 640px; margin: 0; }
 .sec-head { max-width: 900px; margin-bottom: 56px; }
@@ -150,25 +148,26 @@ section { position: relative; padding-block: clamp(90px, 12vw, 160px); }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 .demo .reset { margin-top: 14px; background: none; border: 0; color: var(--faint); font: 13px var(--body); cursor: pointer; text-decoration: underline; padding: 0; }
 
-/* ============ horizontal 3D feature ride ============ */
-.ride { padding-block: 100px 0; }
-.ride .viewport { overflow: hidden; }
-.ride .track { display: flex; gap: 40px; padding: 30px max(24px, calc((100vw - 1240px) / 2 + 24px)) 80px; width: max-content; perspective: 1600px; }
-.fcard { flex: none; width: min(78vw, 980px); display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 36px; align-items: center; padding: 34px; border-radius: 28px;
-  background: linear-gradient(160deg, #161941ee, #0d0f2bee); border: 1px solid var(--line2); box-shadow: 0 60px 110px -50px #000, 0 0 0 1px #ffffff08 inset; transform-style: preserve-3d; will-change: transform; position: relative; }
-.fcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(500px circle at var(--mx, 50%) var(--my, 0%), #7b6cff22, transparent 50%); }
-.fcard .num { font: 500 13px var(--mono); color: var(--faint); letter-spacing: 2px; }
-.fcard .hook { margin: 14px 0 10px; font-size: 16px; }
-.fcard h3 { font-weight: 800; font-size: clamp(28px, 3vw, 42px); line-height: 1.02; letter-spacing: -1px; margin: 0 0 14px; }
-.fcard p { color: var(--muted); margin: 0 0 16px; font-size: 16px; }
+/* ============ features: a calm bento grid (no scroll-jacking) ============ */
+.bento { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.fcard { position: relative; display: grid; gap: 24px; align-content: start; padding: 28px; border-radius: 24px; min-width: 0; overflow: hidden;
+  background: linear-gradient(160deg, #15183dee, #0d0f2bee); border: 1px solid var(--line); transition: border-color .3s, transform .3s; }
+.fcard:hover { border-color: var(--line2); transform: translateY(-4px); }
+.fcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(500px circle at var(--mx, 50%) var(--my, 0%), #7b6cff1c, transparent 50%); }
+.fcard.wide { grid-column: 1 / -1; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: center; gap: 40px; padding: 36px; }
+.fcard .pic { order: -1; }
+.fcard.wide .pic { order: 0; }
+.fcard .num { font: 500 12px var(--mono); color: var(--faint); letter-spacing: 2px; }
+.fcard .hook { margin: 12px 0 8px; font-size: 15px; }
+.fcard h3 { font-weight: 700; font-size: clamp(24px, 2.3vw, 32px); line-height: 1.08; letter-spacing: -.6px; margin: 0 0 10px; }
+.fcard.wide h3 { font-size: clamp(28px, 3vw, 40px); }
+.fcard p { color: var(--muted); margin: 0 0 14px; font-size: 16px; }
 .fcard ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.fcard li { display: flex; gap: 10px; font-size: 15px; }
-.fcard li::before { content: ""; width: 7px; height: 7px; margin-top: 9px; transform: rotate(45deg); border-radius: 2px; background: var(--cyan); flex: none; }
-.fcard .pic { transform: translateZ(60px); transform-style: preserve-3d; }
-.frame { border-radius: 16px; overflow: hidden; border: 1px solid var(--line2); background: var(--card); box-shadow: 0 40px 80px -30px #000; }
-.frame img { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: 50% var(--y, 0%); }
+.fcard li { position: relative; padding-left: 18px; font-size: 15px; }
+.fcard li::before { content: ""; position: absolute; left: 0; top: 9px; width: 7px; height: 7px; transform: rotate(45deg); border-radius: 2px; background: var(--cyan); }
+.frame { border-radius: 14px; overflow: hidden; border: 1px solid var(--line2); background: var(--card); box-shadow: 0 30px 60px -30px #000; }
+.frame img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: 50% var(--y, 0%); }
 .kbd { font: 500 13px var(--mono); padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line2); border-bottom-width: 2px; background: var(--card); color: var(--ink); white-space: nowrap; }
-.ride .hint { color: var(--faint); font: 500 13px var(--mono); letter-spacing: 1px; margin-top: -8px; }
 
 /* before / after */
 .ba { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid var(--line2); aspect-ratio: 1246 / 750; background: #000; cursor: ew-resize; touch-action: pan-y; --p: 50%; }
@@ -259,9 +258,9 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
   .demo .pdf { min-height: 160px; }
   .float { display: none; }
   .explode .scene { transform: none; }
-  .ride .track { flex-direction: column; width: auto; padding: 20px 24px 40px; }
-  .fcard { width: auto; grid-template-columns: minmax(0, 1fr); padding: 24px; gap: 22px; }
-  .fcard .pic { transform: none; order: -1; }
+  .bento { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .fcard, .fcard.wide { grid-template-columns: minmax(0, 1fr); padding: 22px; gap: 20px; }
+  .fcard.wide .pic { order: -1; }
   .duo, .pgrid, .dl-grid { grid-template-columns: minmax(0, 1fr); }
   .dl { grid-template-columns: auto minmax(0, 1fr); }
   .dl .btn { grid-column: 1 / -1; }
@@ -276,7 +275,7 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
   .sec-head { margin-bottom: 36px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .aurora, .ticker .row, .btn.primary::after, .demo .fixbtn, .scrollcue i::after { animation: none; }
+  .aurora, .ticker .row, .demo .fixbtn, .scrollcue i::after { animation: none; }
   .explode .scene, .video .player { transform: none; }
   .storm { display: none; }
 }
@@ -381,17 +380,14 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
   </div>
 </section>
 
-<section class="ride" id="ride" aria-label="Features">
+<section class="ride" id="ride" aria-label="Features" style="padding-top: 60px">
   <div class="wrap">
-    <div class="sec-head" style="margin-bottom: 10px">
+    <div class="sec-head">
       <div class="eyebrow">What makes it easy</div>
       <h2 class="split">Everything you fight with in LaTeX, <span class="grad">handled.</span></h2>
-      <p class="hint">Keep scrolling →</p>
     </div>
-  </div>
-  <div class="viewport" id="rideViewport">
-    <div class="track" id="rideTrack">
-      <article class="fcard">
+    <div class="bento">
+      <article class="fcard wide">
         <div class="text">
           <div class="num">01 / ONE-CLICK FIXES</div>
           <p class="hook">Forty errors and a log nobody can read?</p>
@@ -416,7 +412,7 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
           <p>Press <span class="kbd">Ctrl</span> <span class="kbd">L</span> and move charts, images and text boxes where you want them. TESSA rewrites the LaTeX for you.</p>
           <ul><li>Drag, drop and resize on the page</li><li>Works in documents and Beamer slides</li></ul>
         </div>
-        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/layout.webp" style="--y: 40%" alt="Dragging a chart on the PDF in layout mode" width="2160" height="2130" loading="lazy"></div></div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/layout.webp" style="--y: 92%" alt="Dragging a chart on the PDF in layout mode" width="2160" height="2130" loading="lazy"></div></div>
       </article>
       <article class="fcard">
         <div class="text">
@@ -436,7 +432,7 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
           <p>Paste cells from Excel and they become a booktabs table. Click inside any table to sort, add rows or change alignment in a grid.</p>
           <ul><li>Paste from Excel, Sheets or Word</li><li>Sort, transpose, change rules</li></ul>
         </div>
-        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/table.webp" alt="Visual table editor" width="2400" height="1209" loading="lazy"></div></div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/table.webp" style="aspect-ratio: auto" alt="Visual table editor" width="2400" height="1209" loading="lazy"></div></div>
       </article>
       <article class="fcard">
         <div class="text">
@@ -446,7 +442,7 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
           <p>Files, sections, labels, citations, snippets and every command, one fuzzy search away. Export to PDF, PNG or PowerPoint from the same box.</p>
           <ul><li><code>&gt;</code> commands · <code>@</code> sections · <code>#</code> labels</li><li>Export to PowerPoint (.pptx)</li></ul>
         </div>
-        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/palette.webp" alt="Command palette searching export commands" width="2010" height="942" loading="lazy"></div></div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/palette.webp" style="aspect-ratio: auto" alt="Command palette searching export commands" width="2010" height="942" loading="lazy"></div></div>
       </article>
     </div>
   </div>
@@ -686,14 +682,6 @@ if (window.gsap && window.ScrollTrigger && !reduce) {
       .fromTo('.float', { z: 0, opacity: 0, scale: .6 }, { z: (i, el) => +el.dataset.z, opacity: 1, scale: 1, ease: 'none', stagger: .05 }, 0);
     gsap.to('.float', { y: (i) => [-30, 24, -18, 30][i], ease: 'none', scrollTrigger: { trigger: '#explodeStage', start: 'center center', end: 'bottom top', scrub: 1 } });
 
-    // the feature ride: pinned, slides sideways; each card swings in 3D by its distance from the centre
-    const track = document.getElementById('rideTrack');
-    const cards = gsap.utils.toArray('.fcard');
-    const shift = () => -(track.scrollWidth - innerWidth);
-    const swing = () => { const c = innerWidth / 2; cards.forEach(el => { const r = el.getBoundingClientRect(); const d = (r.left + r.width / 2 - c) / innerWidth; gsap.set(el, { rotateY: d * -38, z: -Math.abs(d) * 320, opacity: 1 - Math.min(.55, Math.abs(d) * .7) }); }); };
-    gsap.to(track, { x: shift, ease: 'none', scrollTrigger: { trigger: '#ride', start: 'top top', end: () => '+=' + (-shift()), pin: '#ride', pinSpacing: true, scrub: 1, invalidateOnRefresh: true, onUpdate: swing, onRefresh: swing } });
-    swing();
-
     // the video tilts up into place
     gsap.to('#player', { rotateX: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '#player', start: 'top 95%', end: 'center 60%', scrub: 1 } });
   });
@@ -707,7 +695,7 @@ if (window.gsap && window.ScrollTrigger && !reduce) {
   const bytes = document.getElementById('bytes'); const bo = { v: 48213504 };
   gsap.to(bo, { v: 0, duration: 2.6, ease: 'power3.inOut', scrollTrigger: { trigger: bytes, start: 'top 80%' }, onUpdate: () => { bytes.textContent = Math.round(bo.v).toLocaleString('en-US'); } });
 
-  gsap.utils.toArray('.pgrid .card, .duo .card, .dl, .faq details').forEach((el, i) => gsap.from(el, { opacity: 0, y: 50, rotateX: -18, transformOrigin: '50% 0%', duration: .9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 92%' } }));
+  gsap.utils.toArray('.fcard, .pgrid .card, .duo .card, .dl, .faq details').forEach((el, i) => gsap.from(el, { opacity: 0, y: 50, rotateX: -18, transformOrigin: '50% 0%', duration: .9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 92%' } }));
   addEventListener('load', () => ScrollTrigger.refresh());
 } else {
   window.addEventListener('DOMContentLoaded', () => window.dispatchEvent(new Event('tessa:assemble')));
