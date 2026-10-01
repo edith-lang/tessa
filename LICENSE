@@ -1,0 +1,64 @@
+TESSA END USER LICENSE AGREEMENT (FREEWARE)
+
+Copyright (c) 2026 Adithyan Lalu. All rights reserved.
+
+TESSA ("the Software") is free to download and use, but it is not open source.
+By installing or using the Software you agree to these terms. If you do not
+agree, do not install or use it.
+
+1. WHAT YOU MAY DO
+   a. Install and use the Software on any number of computers you own or
+      control, free of charge, for personal, educational or commercial work.
+   b. Everything you create with the Software (your documents, PDFs, slides
+      and other output) belongs to you. The author claims no rights in it.
+   c. Share the official, unmodified installer for free, as long as you do not
+      charge for it and you keep this license with it. Linking to the official
+      download page is preferred.
+
+2. WHAT YOU MAY NOT DO
+   Except where the law or a third-party license listed in section 4 expressly
+   allows it, you may not:
+   a. modify, adapt, translate or create derivative works of the Software;
+   b. reverse engineer, decompile, disassemble, extract or otherwise attempt to
+      obtain the Software's source code, or remove or bypass any protection
+      built into it;
+   c. sell, resell, rent, lease, lend, sublicense or otherwise charge money for
+      the Software, or include it in a product or service that is sold;
+   d. distribute modified copies, or publish the Software under another name;
+   e. remove or alter this license, the copyright notice, or the name and
+      branding of the Software or its author.
+
+3. OWNERSHIP
+   The Software is licensed, not sold. The author keeps all rights, title and
+   interest in the Software, including its name "TESSA", its logo, its design
+   and its original code. These terms give you no right to use the name or
+   logo except to refer to the Software accurately.
+
+4. THIRD-PARTY COMPONENTS
+   The Software includes open-source components (for example Electron,
+   Tectonic, Monaco Editor, PDF.js, KaTeX and PptxGenJS). Each of them is
+   provided under its own license, listed in THIRD_PARTY_NOTICES.txt. Nothing
+   in this agreement limits the rights those licenses give you for those
+   components.
+
+5. UPDATES AND TERMINATION
+   The author may update or stop offering the Software at any time. This
+   license ends automatically if you break its terms; you must then delete
+   every copy you have.
+
+6. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. KEEP BACKUPS OF YOUR
+   WORK.
+
+7. LIMITATION OF LIABILITY
+   TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE AUTHOR IS NOT LIABLE FOR ANY
+   DIRECT, INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL DAMAGES, INCLUDING
+   LOSS OF DATA, ARISING FROM THE USE OF OR INABILITY TO USE THE SOFTWARE,
+   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+8. GOVERNING LAW
+   This agreement is governed by the laws of India.
+
+Contact: adhy092018@gmail.com
