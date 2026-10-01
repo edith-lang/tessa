@@ -2,261 +2,367 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TESSA — the LaTeX studio that fixes your errors</title>
-<meta name="description" content="TESSA is a free, offline LaTeX studio for Windows. It explains and fixes errors in one click, lets you drag things right on the PDF, and keeps every file on your computer.">
+<meta name="description" content="TESSA is a free, offline LaTeX studio for Windows. It explains your errors in plain English, fixes them in one click, and lets you drag things right on the PDF.">
+<meta name="theme-color" content="#07081a">
 <meta property="og:title" content="TESSA — Stop debugging. Start writing.">
-<meta property="og:description" content="A free, offline LaTeX studio that fixes your errors and lets you drag things right on the PDF.">
-<meta property="og:image" content="assets/og.png">
-<meta name="theme-color" content="#0b0c1a">
+<meta property="og:description" content="A free, offline LaTeX studio that explains and fixes your errors in one click.">
+<meta property="og:image" content="https://edith-lang.github.io/tessa/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="assets/app.webp">
 <style>
-/* Layout: a dark indigo night sky. 3D mosaic hero, then alternating feature rows with tilted screenshots, video, downloads. */
+/* TESSA: a night-sky indigo studio. Hook first (an error storm that gets fixed), then a 3D exploded app, a pinned
+   horizontal feature ride, before/after fix slider, video, privacy counter, downloads. Everything is readable without JS;
+   motion only adds on top and is switched off for prefers-reduced-motion. */
 :root {
-  --bg: #0b0c1a; --bg2: #111329; --card: #161936; --line: #262a52; --ink: #eef0fb; --muted: #a3a8c8; --faint: #6e739a;
-  --indigo: #5a47d6; --cyan: #8fe3ff; --ok: #57d7a1;
-  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
-  --mono: "JetBrains Mono", Consolas, monospace;
-  color-scheme: dark;
+  --bg: #07081a; --bg2: #0b0c24; --card: #11132e; --card2: #161941; --line: #262a5c; --line2: #353a7a;
+  --ink: #f2f1ff; --muted: #a9acd6; --faint: #6d71a6;
+  --violet: #7b6cff; --violet2: #a99cff; --cyan: #8fe3ff; --amber: #f0a04b; --red: #ff6b7d; --green: #4fd1a1;
+  --display: "Bricolage Grotesque", system-ui, sans-serif; --body: "Instrument Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --r: 22px;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); overflow-x: hidden; }
+html { background: var(--bg); color-scheme: dark; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; height: auto; display: block; }
 a { color: var(--cyan); }
-img { max-width: 100%; height: auto; display: block; } /* height:auto keeps the width/height attributes from stretching images */
-[hidden] { display: none !important; }
-.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
-:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+code { font: 500 .9em var(--mono); color: var(--cyan); }
+::selection { background: #7b6cff66; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 24px; }
+
+/* film grain + aurora, fixed behind everything */
+.aurora { position: fixed; inset: -20vmax; z-index: -2; pointer-events: none; filter: blur(60px); opacity: .55;
+  background: radial-gradient(40vmax 30vmax at 20% 10%, #3b2f9e88, transparent 70%), radial-gradient(35vmax 30vmax at 85% 30%, #13698a55, transparent 70%), radial-gradient(40vmax 35vmax at 50% 95%, #4a2a9a55, transparent 70%);
+  animation: drift 26s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: translate3d(4vmax, -3vmax, 0) rotate(8deg); } }
+.grain { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: .06; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.glow { position: fixed; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none; z-index: -1;
+  background: radial-gradient(closest-side, #7b6cff22, transparent); transform: translate3d(-999px, -999px, 0); }
+.progress { position: fixed; left: 0; top: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); z-index: 60; background: linear-gradient(90deg, var(--violet), var(--cyan)); }
 
 /* nav */
-nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: color-mix(in srgb, var(--bg) 72%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
-nav .wrap { display: flex; align-items: center; gap: 22px; height: 64px; }
-.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 800 21px var(--display); letter-spacing: 1.5px; }
-.brand img { width: 30px; height: 30px; }
-nav .links { display: flex; gap: 22px; margin-left: auto; }
-nav .links a { color: var(--muted); text-decoration: none; font-size: 15px; }
-nav .links a:hover { color: var(--ink); }
-.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 14px; font: 600 16px var(--body); text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .15s, box-shadow .2s, background .2s; }
-.btn.primary { background: linear-gradient(135deg, #7d6bff, var(--indigo)); color: #fff; box-shadow: 0 10px 30px -10px #6a55ff; }
-.btn.primary:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -10px #6a55ff; }
-.btn.ghost { border-color: var(--line); color: var(--ink); background: color-mix(in srgb, var(--card) 70%, transparent); }
-.btn.ghost:hover { border-color: var(--cyan); }
-.btn.sm { padding: 9px 16px; font-size: 14.5px; border-radius: 11px; }
+nav { position: fixed; inset: 14px 0 auto; z-index: 50; pointer-events: none; }
+nav .bar { pointer-events: auto; max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 22px; height: 60px; padding: 0 10px 0 18px;
+  border-radius: 18px; border: 1px solid #ffffff12; background: #0b0c24aa; backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+@media (max-width: 1240px) { nav .bar { margin-inline: 14px; } }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 800 20px var(--display); letter-spacing: 1.5px; }
+.brand img { width: 28px; height: 28px; }
+nav .links { display: flex; gap: 4px; margin-left: auto; }
+nav .links a { color: var(--muted); text-decoration: none; font-size: 15px; padding: 8px 12px; border-radius: 10px; transition: color .2s, background .2s; }
+nav .links a:hover { color: var(--ink); background: #ffffff0d; }
 
-/* hero */
-.hero { position: relative; min-height: min(860px, 100svh); display: grid; align-items: center; overflow: hidden; }
-.hero::before { content: ""; position: absolute; inset: -20% -10% auto; height: 120%; background: radial-gradient(50% 45% at 72% 40%, #3b2f9e66, transparent 70%), radial-gradient(35% 35% at 15% 20%, #1d6d8a44, transparent 70%); pointer-events: none; }
-#stage { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero .wrap { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 30px; width: 100%; pointer-events: none; }
-.hero .copy { pointer-events: auto; padding-block: 60px; }
-.eyebrow { font: 500 13px var(--mono); letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); }
-h1 { font: 800 clamp(44px, 7vw, 86px)/0.98 var(--display); letter-spacing: -2.5px; margin: 14px 0 22px; text-wrap: balance; }
-h1 em { font-style: normal; background: linear-gradient(100deg, var(--cyan), #b9a8ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.lead { font-size: 19.5px; color: var(--muted); max-width: 34ch; margin: 0 0 30px; }
-.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.cta small { display: block; width: 100%; color: var(--faint); font-size: 13.5px; margin-top: 6px; }
-.fallback-logo { position: absolute; right: 8%; top: 50%; width: min(36vw, 380px); transform: translateY(-50%); opacity: .95; }
+/* buttons */
+.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 26px; border-radius: 15px; font: 600 16px var(--body); text-decoration: none; border: 1px solid transparent; cursor: pointer; isolation: isolate; will-change: transform; }
+.btn.primary { color: #fff; background: linear-gradient(135deg, #8b7bff, #5b47f0); box-shadow: 0 14px 40px -12px #6a55ff, inset 0 1px 0 #ffffff40; }
+.btn.primary::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; z-index: -1; background: conic-gradient(from var(--a, 0deg), #8fe3ff, #7b6cff, #f0a04b, #8fe3ff); filter: blur(12px); opacity: .55; animation: spin 4s linear infinite; }
+@property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes spin { to { --a: 360deg; } }
+.btn.ghost { color: var(--ink); background: #ffffff08; border-color: var(--line2); }
+.btn.ghost:hover { background: #ffffff12; }
+.btn.sm { padding: 10px 18px; font-size: 15px; border-radius: 12px; }
 
-/* trust strip */
-.strip { border-block: 1px solid var(--line); background: var(--bg2); }
-.strip .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding-block: 22px; }
-.strip div { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 15px; }
-.strip b { color: var(--ink); font-weight: 600; }
-.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 12px var(--ok); }
+/* typography */
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; font: 500 13px var(--mono); letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); }
+.eyebrow::before { content: ""; width: 22px; height: 1px; background: currentColor; }
+h1, h2, h3 { font-family: var(--display); margin: 0; }
+h2 { font-weight: 800; font-size: clamp(36px, 5.6vw, 76px); line-height: 1; letter-spacing: -2px; margin: 16px 0 18px; }
+.grad { background: linear-gradient(100deg, var(--cyan), var(--violet2) 55%, #ffb8d9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hook { font: 500 clamp(17px, 1.6vw, 21px)/1.4 var(--mono); color: var(--red); margin: 0; }
+.hook::before { content: "> "; color: var(--faint); }
+.lead { color: var(--muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 640px; margin: 0; }
+.sec-head { max-width: 900px; margin-bottom: 56px; }
+section { position: relative; padding-block: clamp(90px, 12vw, 160px); }
+.split .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; }
+.split .w > span { display: inline-block; will-change: transform; }
+/* split words are their own boxes, so each gradient word paints its own gradient */
+.split .grad .w > span { background: linear-gradient(100deg, var(--cyan), var(--violet2) 55%, #ffb8d9); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-/* features */
-section { padding-block: 84px; }
-.sec-head { max-width: 680px; margin-bottom: 50px; }
-h2 { font: 800 clamp(32px, 4.4vw, 52px)/1.05 var(--display); letter-spacing: -1.4px; margin: 10px 0 14px; text-wrap: balance; }
-.sec-head p { color: var(--muted); margin: 0; font-size: 18.5px; }
-.feature { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 56px; align-items: center; margin-bottom: 72px; }
-.feature:last-child { margin-bottom: 0; }
-.feature:nth-of-type(even) { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
-.feature:nth-of-type(even) .text { order: 2; }
-.feature h3 { font: 700 clamp(26px, 3vw, 36px)/1.1 var(--display); letter-spacing: -.8px; margin: 10px 0 12px; }
-.feature p { color: var(--muted); margin: 0 0 16px; }
-.feature ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.feature li { display: flex; gap: 10px; color: var(--ink); font-size: 15.5px; }
-.feature li::before { content: ""; width: 7px; height: 7px; margin-top: 9px; border-radius: 2px; transform: rotate(45deg); background: var(--cyan); flex: none; }
-.kbd { font: 500 13px var(--mono); padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); border-bottom-width: 2px; background: var(--card); color: var(--ink); white-space: nowrap; }
-.shot { perspective: 1400px; }
-.shot .frame { border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--card); box-shadow: 0 40px 80px -30px #000, 0 0 0 1px #ffffff08 inset; transform: rotateY(-5deg) rotateX(2deg); transition: transform .5s cubic-bezier(.2,.7,.2,1); transform-style: preserve-3d; }
-.feature:nth-of-type(even) .shot .frame { transform: rotateY(5deg) rotateX(2deg); }
-.shot .bar { height: 30px; display: flex; gap: 7px; align-items: center; padding-inline: 12px; background: #0e1026; border-bottom: 1px solid var(--line); }
-.shot .bar i { width: 10px; height: 10px; border-radius: 50%; background: #2c3060; }
-.shot img { width: 100%; height: auto; }
-/* tall portrait screenshots are cropped to a landscape window so rows don't turn into tall, stretched columns */
-.shot img.crop, .card img.crop { aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% var(--y, 0%); }
-.shot { max-width: 620px; justify-self: center; width: 100%; }
+/* ============ HERO: the hook ============ */
+.hero { position: relative; min-height: 100svh; display: grid; align-items: center; overflow: hidden; padding-top: 90px; }
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.storm { position: absolute; inset: 0; perspective: 900px; pointer-events: none; overflow: hidden; }
+.storm span { position: absolute; left: 50%; top: 50%; white-space: nowrap; font: 600 clamp(13px, 1.3vw, 17px) var(--mono); color: var(--red); padding: 8px 14px; border-radius: 10px;
+  background: #2a0f1fcc; border: 1px solid #ff6b7d55; box-shadow: 0 10px 40px -10px #ff2d5566; opacity: 0; will-change: transform, opacity; }
+.storm span.fixed { color: var(--green); background: #0d2a22cc; border-color: #4fd1a155; box-shadow: 0 10px 40px -10px #4fd1a166; text-decoration: line-through; }
+.hero .wrap { position: relative; z-index: 2; width: 100%; pointer-events: none; }
+.hero .copy { max-width: 640px; pointer-events: auto; padding-block: 40px; }
+.hero h1 { font-weight: 800; font-size: clamp(54px, 8.4vw, 124px); line-height: .92; letter-spacing: -3.5px; margin: 22px 0 26px; }
+.hero h1 .l1, .hero h1 .l2 { display: block; }
+.hero .lead { margin-bottom: 34px; }
+.cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.cta small { flex-basis: 100%; color: var(--faint); font-size: 14px; margin-top: 6px; }
+.scrollcue { position: absolute; left: 50%; bottom: 26px; z-index: 2; transform: translateX(-50%); color: var(--faint); font: 500 12px var(--mono); letter-spacing: 2px; text-transform: uppercase; display: grid; justify-items: center; gap: 10px; }
+.scrollcue i { width: 22px; height: 36px; border: 1.5px solid var(--line2); border-radius: 12px; position: relative; }
+.scrollcue i::after { content: ""; position: absolute; left: 50%; top: 7px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: var(--cyan); animation: wheel 1.8s ease-in-out infinite; }
+@keyframes wheel { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
 
-/* showcase */
-.showcase { padding-block: 70px 10px; perspective: 1800px; }
-.win3d { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #0e1026; box-shadow: 0 60px 120px -40px #000, 0 0 0 1px #ffffff0a inset, 0 0 80px -20px #5a47d655;
-  transform: rotateX(calc(var(--tilt, 1) * 22deg)) scale(calc(1 - var(--tilt, 1) * 0.08)); transform-origin: 50% 0; transition: transform .1s linear; }
-.win3d .bar { height: 36px; display: flex; gap: 8px; align-items: center; padding-inline: 14px; border-bottom: 1px solid var(--line); color: var(--faint); font: 500 12px var(--mono); }
-.win3d .bar i { width: 11px; height: 11px; border-radius: 50%; background: #2c3060; }
-.win3d .bar span { margin-left: 10px; }
-.win3d img { width: 100%; height: auto; }
+/* ticker */
+.ticker { border-block: 1px solid var(--line); background: #0b0c24cc; overflow: hidden; padding-block: 20px; position: relative; z-index: 3; }
+.ticker .row { display: flex; gap: 46px; width: max-content; animation: tick 38s linear infinite; }
+.ticker span { display: inline-flex; align-items: center; gap: 46px; font: 700 clamp(20px, 2.4vw, 30px) var(--display); color: var(--muted); white-space: nowrap; letter-spacing: -.5px; }
+.ticker span::after { content: ""; width: 12px; height: 12px; background: var(--violet); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ticker b { color: var(--ink); }
+@keyframes tick { to { transform: translateX(-50%); } }
 
-/* interactive fix demo */
-.demo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 0; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: #0e1026; margin-bottom: 84px; }
-.demo .code { padding: 26px 26px 22px; font: 15px/1.9 var(--mono); color: #c9cdf0; border-right: 1px solid var(--line); min-width: 0; overflow-x: auto; }
-.demo .ln { color: #4b5080; display: inline-block; width: 2.2em; user-select: none; }
-.demo .cmd { color: #f0a04b; } .demo .arg { color: #8fe3ff; }
-.demo .typo { text-decoration: underline wavy #ff626e; text-underline-offset: 4px; transition: color .3s; }
-.demo .fixed { color: #57d7a1; text-decoration: none; }
-.demo .problem { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: #1b1d3e; border: 1px solid #3a2f5f; font: 14px/1.55 var(--body); color: var(--muted); display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; transition: opacity .4s, transform .4s; }
+/* ============ 3D exploded app ============ */
+.explode { padding-block: 120px 60px; }
+.explode .stage { position: relative; perspective: 2200px; perspective-origin: 50% 30%; margin-top: 30px; }
+.explode .scene { position: relative; transform-style: preserve-3d; transform: rotateX(28deg) rotateZ(-6deg) scale(.88); will-change: transform; }
+.appwin { position: relative; border-radius: 18px; overflow: hidden; border: 1px solid var(--line2); background: var(--card); transform-style: preserve-3d;
+  box-shadow: 0 80px 140px -40px #000, 0 0 0 1px #ffffff0a inset, 0 0 120px -30px #7b6cff88; }
+.appwin .bar, .frame .bar { height: 34px; display: flex; gap: 8px; align-items: center; padding-inline: 14px; background: #0e1026; border-bottom: 1px solid var(--line); color: var(--faint); font: 500 12px var(--mono); }
+.appwin .bar i, .frame .bar i { width: 10px; height: 10px; border-radius: 50%; background: #2c3060; }
+.appwin .bar i:nth-child(1) { background: #ff6b7d; } .appwin .bar i:nth-child(2) { background: #f0a04b; } .appwin .bar i:nth-child(3) { background: #4fd1a1; }
+.appwin .bar span { margin-left: 8px; }
+.float { position: absolute; border-radius: 14px; overflow: hidden; border: 1px solid var(--line2); background: var(--card); box-shadow: 0 50px 90px -30px #000, 0 0 60px -20px #7b6cff99; will-change: transform; }
+.float.f1 { width: 34%; left: -4%; top: 8%; }
+.float.f2 { width: 30%; right: -5%; top: -6%; }
+.float.f3 { width: 32%; right: 2%; bottom: -10%; }
+.float.f4 { width: 26%; left: 6%; bottom: -12%; }
+.explode .caption { display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin-top: clamp(90px, 13vw, 190px); color: var(--muted); font-size: 15px; }
+.explode .caption b { display: block; font: 800 clamp(30px, 4vw, 48px)/1 var(--display); color: var(--ink); letter-spacing: -1px; }
+
+/* ============ try it: the typo demo ============ */
+.demo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); border: 1px solid var(--line2); border-radius: var(--r); overflow: hidden; background: #0e1026;
+  box-shadow: 0 60px 120px -50px #000, 0 0 0 1px #ffffff08 inset; transform-style: preserve-3d; }
+.demo .code { padding: 30px 30px 26px; font: 15px/1.95 var(--mono); color: #c9cdf0; border-right: 1px solid var(--line); min-width: 0; overflow-x: auto; }
+.demo .ln { display: inline-block; width: 26px; color: #4b5089; user-select: none; }
+.demo .cmd { color: var(--amber); } .demo .arg { color: var(--cyan); }
+.demo .typo { text-decoration: underline wavy var(--red); text-underline-offset: 4px; }
+.demo .fixed { color: var(--green); animation: pop .5s ease; }
+@keyframes pop { 40% { transform: scale(1.18); text-shadow: 0 0 18px var(--green); } }
+.demo .problem { margin-top: 18px; padding: 16px 18px; border-radius: 14px; background: #1b1d3e; border: 1px solid #5a2f4f; font: 14px/1.55 var(--body); color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; transition: opacity .4s, transform .4s; }
 .demo .problem b { color: var(--ink); }
-.demo .problem.gone { opacity: 0; transform: translateY(6px); pointer-events: none; }
-.demo .fixbtn { margin-left: auto; padding: 8px 14px; border-radius: 10px; border: 0; background: #f0a04b; color: #1d1405; font: 600 14px var(--body); cursor: pointer; }
-.demo .fixbtn:hover { filter: brightness(1.08); }
-.demo .pdf { background: #f7f6f2; color: #1b1b1b; display: grid; place-items: center; padding: 30px; min-height: 260px; font-family: "Latin Modern Roman", "Computer Modern", Georgia, serif; text-align: center; }
-.demo .pdf .t { font-size: 28px; transition: opacity .5s; }
-.demo .pdf .a { font-size: 17px; margin-top: 10px; }
-.demo .pdf .err { font: 600 14px var(--mono); color: #c0313d; }
+.demo .problem.gone { opacity: 0; transform: translateY(8px) scale(.98); pointer-events: none; }
+.demo .fixbtn { margin-left: auto; padding: 10px 16px; border-radius: 11px; border: 0; background: var(--amber); color: #1d1405; font: 600 14px var(--body); cursor: pointer; box-shadow: 0 10px 30px -10px #f0a04b; animation: nudge 2.4s ease-in-out infinite; }
+@keyframes nudge { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(-3px); } 90% { transform: translateY(1px); } }
+.demo .pdf { background: #f7f6f2; color: #1b1b1b; display: grid; place-items: center; padding: 30px; min-height: 280px; font-family: "Latin Modern Roman", "Computer Modern", Georgia, serif; text-align: center; }
+.demo .pdf .err { color: #b3261e; font: 600 15px var(--mono); }
+.demo .pdf .t { font-size: 30px; } .demo .pdf .a { color: #555; margin-top: 6px; }
+.demo .pdf .t, .demo .pdf .a { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 .demo .reset { margin-top: 14px; background: none; border: 0; color: var(--faint); font: 13px var(--body); cursor: pointer; text-decoration: underline; padding: 0; }
 
-/* video */
-.video { background: linear-gradient(180deg, var(--bg), var(--bg2)); }
-.player { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 50px 100px -40px #000; aspect-ratio: 16 / 9; background: #070814; max-width: 100%; }
-.player video { width: 100%; height: 100%; display: block; }
+/* ============ horizontal 3D feature ride ============ */
+.ride { padding-block: 100px 0; }
+.ride .viewport { overflow: hidden; }
+.ride .track { display: flex; gap: 40px; padding: 30px max(24px, calc((100vw - 1240px) / 2 + 24px)) 80px; width: max-content; perspective: 1600px; }
+.fcard { flex: none; width: min(78vw, 980px); display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 36px; align-items: center; padding: 34px; border-radius: 28px;
+  background: linear-gradient(160deg, #161941ee, #0d0f2bee); border: 1px solid var(--line2); box-shadow: 0 60px 110px -50px #000, 0 0 0 1px #ffffff08 inset; transform-style: preserve-3d; will-change: transform; position: relative; }
+.fcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(500px circle at var(--mx, 50%) var(--my, 0%), #7b6cff22, transparent 50%); }
+.fcard .num { font: 500 13px var(--mono); color: var(--faint); letter-spacing: 2px; }
+.fcard .hook { margin: 14px 0 10px; font-size: 16px; }
+.fcard h3 { font-weight: 800; font-size: clamp(28px, 3vw, 42px); line-height: 1.02; letter-spacing: -1px; margin: 0 0 14px; }
+.fcard p { color: var(--muted); margin: 0 0 16px; font-size: 16px; }
+.fcard ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.fcard li { display: flex; gap: 10px; font-size: 15px; }
+.fcard li::before { content: ""; width: 7px; height: 7px; margin-top: 9px; transform: rotate(45deg); border-radius: 2px; background: var(--cyan); flex: none; }
+.fcard .pic { transform: translateZ(60px); transform-style: preserve-3d; }
+.frame { border-radius: 16px; overflow: hidden; border: 1px solid var(--line2); background: var(--card); box-shadow: 0 40px 80px -30px #000; }
+.frame img { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: 50% var(--y, 0%); }
+.kbd { font: 500 13px var(--mono); padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line2); border-bottom-width: 2px; background: var(--card); color: var(--ink); white-space: nowrap; }
+.ride .hint { color: var(--faint); font: 500 13px var(--mono); letter-spacing: 1px; margin-top: -8px; }
 
-/* tour + setup */
-.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 26px; min-width: 0; }
-.card h3 { font: 700 24px var(--display); margin: 0 0 8px; letter-spacing: -.4px; }
-.card p { color: var(--muted); margin: 0 0 18px; }
-.card img { border-radius: 12px; border: 1px solid var(--line); }
+/* before / after */
+.ba { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid var(--line2); aspect-ratio: 1246 / 750; background: #000; cursor: ew-resize; touch-action: pan-y; --p: 50%; }
+.ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ba .before { clip-path: inset(0 calc(100% - var(--p)) 0 0); }
+.ba .handle { position: absolute; top: 0; bottom: 0; left: var(--p); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 20px #8fe3ff; }
+.ba .handle::after { content: "⟷"; position: absolute; top: 50%; left: 50%; width: 42px; height: 42px; margin: -21px 0 0 -21px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: #1a1840; font: 700 18px var(--body); box-shadow: 0 10px 30px #0008; }
+.ba .tag { position: absolute; top: 12px; padding: 4px 10px; border-radius: 8px; font: 600 12px var(--mono); letter-spacing: 1px; }
+.ba .tag.l { left: 12px; background: #ff6b7d; color: #2a0710; } .ba .tag.r { right: 12px; background: #4fd1a1; color: #052a1d; }
 
-/* privacy */
-.privacy .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.privacy .card b { display: block; font: 700 19px var(--display); margin-bottom: 4px; }
-.privacy .card span { color: var(--muted); font-size: 15px; }
-.bytes { font: 500 clamp(40px, 7vw, 76px) var(--mono); color: var(--ok); letter-spacing: -2px; margin: 0 0 6px; }
+/* ============ video ============ */
+.video .player { position: relative; border-radius: 26px; overflow: hidden; border: 1px solid var(--line2); aspect-ratio: 16 / 9; background: #070814;
+  box-shadow: 0 80px 160px -50px #000, 0 0 160px -40px #7b6cffaa; transform: perspective(1800px) rotateX(18deg) scale(.9); will-change: transform; }
+.video .player video { width: 100%; height: 100%; display: block; }
 
-/* downloads */
-.downloads { background: radial-gradient(60% 50% at 50% 0%, #2a2380aa, transparent 70%), var(--bg2); border-top: 1px solid var(--line); }
-.dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 980px; }
-.dl { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; transition: border-color .2s, transform .2s; }
-.dl.mine { border-color: var(--cyan); box-shadow: 0 0 0 3px #8fe3ff22; }
-.dl:hover { transform: translateY(-2px); }
-.dl .os { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: #0e1026; border: 1px solid var(--line); }
-.dl h3 { margin: 0; font: 700 19px var(--display); }
-.dl .meta { color: var(--faint); font-size: 13.5px; }
-.dl .tag { font: 500 11px var(--mono); color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-left: 6px; }
-details.sums { margin-top: 26px; color: var(--muted); }
-details.sums summary { cursor: pointer; color: var(--ink); }
-.sumtable { overflow-x: auto; margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; }
-.sumtable table { border-collapse: collapse; width: 100%; font-size: 13px; }
+/* ============ learn ============ */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; perspective: 1400px; }
+.tilt { transform-style: preserve-3d; transition: transform .25s ease-out; will-change: transform; }
+.card { position: relative; background: linear-gradient(160deg, var(--card2), var(--card)); border: 1px solid var(--line); border-radius: var(--r); padding: 28px; min-width: 0; overflow: hidden; }
+.card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -20%), #8fe3ff18, transparent 55%); }
+.card h3 { font-size: 26px; letter-spacing: -.5px; margin: 10px 0 8px; }
+.card p { color: var(--muted); margin: 0 0 20px; }
+.card .frame { transform: translateZ(40px); }
+
+/* ============ privacy ============ */
+.privacy { text-align: center; }
+.privacy .sec-head { margin-inline: auto; }
+.bytes { font: 700 clamp(48px, 10vw, 150px)/1 var(--mono); letter-spacing: -3px; white-space: nowrap; margin: 26px 0 6px; background: linear-gradient(180deg, #fff, #8fe3ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+.bytes small { display: block; font-size: .32em; letter-spacing: 0; margin-top: 8px; }
+.privacy h2 { font-size: clamp(30px, 4.4vw, 56px); }
+.privacy .lead { margin-inline: auto; }
+.pgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 50px; text-align: left; perspective: 1200px; }
+.pgrid .card b { display: block; font: 700 21px var(--display); margin-bottom: 4px; }
+.pgrid .card span { color: var(--muted); font-size: 15px; }
+.pgrid .card svg { margin-bottom: 14px; }
+.note { color: var(--faint); font-size: 14.5px; }
+
+/* ============ downloads ============ */
+.downloads .inner { position: relative; border-radius: 36px; padding: clamp(36px, 6vw, 80px); overflow: hidden; border: 1px solid var(--line2);
+  background: radial-gradient(70% 60% at 50% 0%, #3a2fa055, transparent 70%), linear-gradient(180deg, #11133a, #0a0b22); }
+.downloads .inner::after { content: ""; position: absolute; inset: auto -10% -60% -10%; height: 90%; background: radial-gradient(closest-side, #8fe3ff22, transparent); pointer-events: none; }
+.dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 980px; position: relative; z-index: 1; }
+.dl { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #11132ecc; border: 1px solid var(--line2); border-radius: 18px; padding: 22px; text-decoration: none; color: inherit; transition: border-color .2s, transform .2s; position: relative; overflow: hidden; }
+.dl::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), #7b6cff26, transparent 60%); opacity: 0; transition: opacity .3s; }
+.dl:hover::before { opacity: 1; }
+.dl:hover { border-color: var(--violet); transform: translateY(-3px); }
+.dl.mine { border-color: #7b6cff; box-shadow: 0 0 0 1px #7b6cff55, 0 30px 60px -30px #7b6cff; }
+.dl h3 { font: 700 18px var(--display); margin: 0; }
+.dl .meta { color: var(--muted); font-size: 14px; }
+.dl .tag { font: 500 11px var(--mono); color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-left: 8px; }
+.dl .os { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 13px; background: #1c1f4a; }
+.sums { margin-top: 24px; position: relative; z-index: 1; }
+.sums summary { cursor: pointer; color: var(--muted); }
+.sumtable { overflow-x: auto; margin-top: 10px; }
+.sumtable table { border-collapse: collapse; font-size: 13px; }
 .sumtable td { padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-.sumtable code { font-family: var(--mono); color: var(--muted); }
-.note { color: var(--faint); font-size: 14.5px; margin-top: 18px; max-width: 75ch; }
 
-/* faq */
-.faq { display: grid; gap: 12px; max-width: 860px; }
-.faq details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; }
-.faq summary { cursor: pointer; font-weight: 600; font-size: 17.5px; }
-.faq p { color: var(--muted); margin: 10px 0 0; }
+/* ============ faq ============ */
+.faq { display: grid; gap: 12px; max-width: 880px; }
+.faq details { background: #11132ecc; border: 1px solid var(--line); border-radius: 16px; padding: 18px 22px; transition: border-color .2s, background .2s; }
+.faq details[open] { border-color: var(--line2); background: var(--card2); }
+.faq summary { cursor: pointer; font: 600 18px var(--display); list-style: none; display: flex; justify-content: space-between; gap: 20px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--cyan); font: 400 26px/1 var(--body); transition: transform .3s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq p { color: var(--muted); margin: 12px 0 0; }
 
+/* ============ closing ============ */
+.closing { text-align: center; padding-block: 120px; }
+.closing h2 { font-size: clamp(44px, 9vw, 140px); letter-spacing: -4px; }
 footer { border-top: 1px solid var(--line); padding-block: 40px 60px; color: var(--faint); font-size: 14.5px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 26px; align-items: center; }
 footer a { color: var(--muted); text-decoration: none; }
 footer a:hover { color: var(--ink); }
 footer .email { font-family: var(--mono); color: var(--muted); user-select: all; }
 
-.reveal { opacity: 1; transform: none; transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
-.js .reveal.pending { opacity: 0; transform: translateY(26px); }
-
+/* ============ responsive ============ */
 @media (max-width: 900px) {
-  .hero .wrap, .feature, .feature:nth-of-type(even), .duo, .dl-grid, .privacy .grid { grid-template-columns: minmax(0, 1fr); }
-  .feature:nth-of-type(even) .text { order: 0; }
+  nav .links { display: none; }
+  nav .bar .btn { margin-left: auto; }
+  .hero { min-height: auto; padding-top: 110px; }
+  .hero .copy { padding-block: 10px 330px; }
+  .hero h1 { font-size: clamp(46px, 13vw, 64px); letter-spacing: -2px; margin: 16px 0 18px; }
+  .hero .lead { font-size: 16px; margin-bottom: 26px; }
+  #stage { inset: auto 0 0 0; height: 340px; }
   .demo { grid-template-columns: minmax(0, 1fr); }
   .demo .code { border-right: 0; border-bottom: 1px solid var(--line); }
-  .hero { min-height: auto; }
-  .hero .copy { padding-block: 40px 300px; }
-  /* phones: the 3D T gets its own band under the copy so flying tiles never cross the text */
-  #stage { inset: auto 0 0 0; height: 300px; }
-  .demo .pdf { min-height: 150px; padding: 22px; }
-  .strip .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  nav .links { display: none; }
-  nav .btn { margin-left: auto; }
-  section { padding-block: 80px; }
-  .feature { margin-bottom: 80px; gap: 28px; }
-  .shot .frame, .feature:nth-of-type(even) .shot .frame { transform: none; }
-  .fallback-logo { right: 50%; top: auto; bottom: 30px; transform: translateX(50%); width: 240px; }
+  .demo .pdf { min-height: 160px; }
+  .float { display: none; }
+  .explode .scene { transform: none; }
+  .ride .track { flex-direction: column; width: auto; padding: 20px 24px 40px; }
+  .fcard { width: auto; grid-template-columns: minmax(0, 1fr); padding: 24px; gap: 22px; }
+  .fcard .pic { transform: none; order: -1; }
+  .duo, .pgrid, .dl-grid { grid-template-columns: minmax(0, 1fr); }
   .dl { grid-template-columns: auto minmax(0, 1fr); }
-  .dl .btn { grid-column: 1 / -1; justify-content: center; }
+  .dl .btn { grid-column: 1 / -1; }
+  .video .player { transform: none; }
+  .scrollcue { display: none; }
+  h2 { letter-spacing: -1.2px; line-height: 1.04; }
+  .closing h2 { letter-spacing: -1.5px; font-size: clamp(42px, 12vw, 64px); }
+  .downloads .wrap { padding-inline: 12px; }
+  .downloads .inner { padding: 30px 18px; border-radius: 26px; }
+  .dl { padding: 18px; }
+  section { padding-block: 80px; }
+  .sec-head { margin-bottom: 36px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .reveal, .js .reveal.pending { opacity: 1; transform: none; transition: none; }
-  .shot .frame { transition: none; }
+  .aurora, .ticker .row, .btn.primary::after, .demo .fixbtn, .scrollcue i::after { animation: none; }
+  .explode .scene, .video .player { transform: none; }
+  .storm { display: none; }
 }
 </style>
 </head>
 <body>
+<div class="aurora" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="glow" id="glow" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
 <nav>
-  <div class="wrap">
-    <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="30" height="30">TESSA</a>
+  <div class="bar">
+    <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="28" height="28">TESSA</a>
     <div class="links">
       <a href="#features">Features</a>
       <a href="#video">Watch</a>
       <a href="#privacy">Privacy</a>
       <a href="#faq">FAQ</a>
     </div>
-    <a class="btn primary sm" href="#download">Download free</a>
+    <a class="btn primary sm magnet" href="#download">Download free</a>
   </div>
 </nav>
 
 <header class="hero" id="top">
   <canvas id="stage" aria-hidden="true"></canvas>
-  <img class="fallback-logo" id="fallbackLogo" src="assets/logo.svg" alt="" hidden>
+  <div class="storm" id="storm" aria-hidden="true"></div>
   <div class="wrap">
     <div class="copy">
-      <div class="eyebrow">Typesetting Engine for Smart Scientific Authoring</div>
-      <h1>Stop debugging.<br><em>Start writing.</em></h1>
-      <p class="lead">TESSA is a free LaTeX studio that explains and fixes your errors in one click, lets you drag things right on the PDF, and keeps every file on your computer.</p>
+      <p class="hook" id="hookLine">Be honest. How many evenings has LaTeX stolen from you?</p>
+      <h1><span class="l1">Stop debugging.</span><span class="l2 grad">Start writing.</span></h1>
+      <p class="lead">TESSA is a free LaTeX studio that explains your errors in plain English, fixes them in one click, and lets you drag things right on the PDF. Everything stays on your computer.</p>
       <div class="cta">
-        <a class="btn primary" id="heroDownload" href="#download">Download for Windows</a>
-        <a class="btn ghost" href="#video">Watch the 3-minute tour</a>
-        <small id="heroNote">Free · Windows 10 &amp; 11 · No account, works offline</small>
+        <a class="btn primary magnet" id="heroDownload" href="#download">Download for Windows</a>
+        <a class="btn ghost magnet" href="#video">▶ Watch the 3-minute tour</a>
+        <small>Free · Windows 10 &amp; 11 · No account · Works offline · LaTeX included</small>
       </div>
     </div>
   </div>
+  <div class="scrollcue" aria-hidden="true"><i></i>Scroll</div>
 </header>
 
-<div class="strip">
-  <div class="wrap">
-    <div><span class="dot"></span><span><b>Free</b> for any work</span></div>
-    <div><span class="dot"></span><span><b>Offline</b>: nothing uploaded</span></div>
-    <div><span class="dot"></span><span><b>No account</b> or sign-up</span></div>
-    <div><span class="dot"></span><span><b>LaTeX included</b>, nothing to install</span></div>
+<div class="ticker" aria-hidden="true">
+  <div class="row">
+    <span><b>One-click</b> error fixes</span><span><b>Live</b> PDF as you type</span><span>Drag things <b>on the PDF</b></span><span><b>Equations</b> with a preview</span><span>Spreadsheet → <b>LaTeX table</b></span><span><b>Ctrl K</b> finds anything</span><span>Export to <b>PowerPoint</b></span><span><b>0 bytes</b> uploaded</span>
+    <span><b>One-click</b> error fixes</span><span><b>Live</b> PDF as you type</span><span>Drag things <b>on the PDF</b></span><span><b>Equations</b> with a preview</span><span>Spreadsheet → <b>LaTeX table</b></span><span><b>Ctrl K</b> finds anything</span><span>Export to <b>PowerPoint</b></span><span><b>0 bytes</b> uploaded</span>
   </div>
 </div>
 
 <main>
-<div class="showcase" id="showcase">
+<section class="explode" id="explode">
   <div class="wrap">
-    <div class="win3d" id="win3d">
-      <div class="bar"><i></i><i></i><i></i><span>paper — TESSA</span></div>
-      <img src="assets/app.webp" alt="TESSA with a LaTeX paper on the left and the live PDF on the right" width="1920" height="1020">
+    <div class="sec-head">
+      <p class="hook">It's 2 a.m. The deadline is at nine. The PDF won't build.</p>
+      <h2 class="split">Write on the left. <span class="grad">Watch it typeset</span> on the right.</h2>
+      <p class="lead">Every keystroke updates the PDF. Every mistake gets caught while you type, with the fix one click away.</p>
+    </div>
+    <div class="stage" id="explodeStage">
+      <div class="scene" id="explodeScene">
+        <div class="appwin">
+          <div class="bar"><i></i><i></i><i></i><span>paper — TESSA</span></div>
+          <img src="assets/app.webp" alt="TESSA with a LaTeX paper on the left and the live PDF on the right" width="2400" height="1275">
+        </div>
+        <div class="float f1" data-z="260"><img src="assets/palette.webp" alt="Command palette" width="2010" height="942" loading="lazy"></div>
+        <div class="float f2" data-z="340"><img src="assets/theme.webp" alt="Theme and accent settings" width="2400" height="1592" loading="lazy"></div>
+        <div class="float f3" data-z="200"><img src="assets/table.webp" alt="Visual table editor" width="2400" height="1209" loading="lazy"></div>
+        <div class="float f4" data-z="300"><img src="assets/present.webp" alt="Full-screen presenter" width="2400" height="1700" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="caption">
+      <div><b data-count="1.2" data-dec="1" data-suffix=" s">1.2 s</b>to a fresh PDF</div>
+      <div><b data-count="60" data-suffix="+">60+</b>errors explained</div>
+      <div><b data-count="14">14</b>step hands-on tour</div>
+      <div><b data-count="0">0</b>accounts needed</div>
     </div>
   </div>
-</div>
+</section>
 
-<section id="features">
+<section id="features" style="padding-bottom: 40px">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="eyebrow">What makes it easy</div>
-      <h2>Everything you fight with in LaTeX, handled.</h2>
-      <p>Write on the left, see the PDF on the right, and let TESSA take care of the parts that used to cost you an evening.</p>
+    <div class="sec-head">
+      <p class="hook">! Undefined control sequence. l.2 \titmle{My Report}</p>
+      <h2 class="split">Sound familiar? <span class="grad">Try fixing it.</span></h2>
+      <p class="lead">This is exactly what TESSA does with your real documents. Go on, press the orange button.</p>
     </div>
-
-    <div class="demo reveal" id="demo" aria-label="Try it: fix a typo">
+    <div class="demo tilt" id="demo" aria-label="Try it: fix a typo">
       <div class="code">
         <div><span class="ln">1</span><span class="cmd">\documentclass</span>{<span class="arg">article</span>}</div>
         <div><span class="ln">2</span><span class="cmd typo" id="demoCmd">\titmle</span>{<span class="arg">My Report</span>}</div>
@@ -272,56 +378,88 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
       </div>
       <div class="pdf" id="demoPdf"><div><div class="err" id="demoErr">PDF not built: 1 error</div><div class="t" id="demoTitle" hidden>My Report</div><div class="a" id="demoAuthor" hidden>Sam Rivera</div></div></div>
     </div>
+  </div>
+</section>
 
-    <div class="feature reveal">
-      <div class="text">
-        <div class="eyebrow">One-click fixes</div>
-        <h3>Errors explained in plain English, then fixed.</h3>
-        <p>A typo like <code>\titmle</code> becomes <code>\title</code> with one click. A page full of errors? Press <b>Fix all</b> and TESSA repairs them and compiles again.</p>
-        <ul><li>Misspelled commands and environments</li><li>Missing packages, braces, <code>$</code> and <code>\end{…}</code></li><li>Prices like $5, 50%, # and file paths in text</li></ul>
-      </div>
-      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img class="crop" style="--y: 100%" src="assets/shot-fix.webp" alt="TESSA showing an explained error and a one-click fix" width="642" height="930" loading="lazy"></div></div>
+<section class="ride" id="ride" aria-label="Features">
+  <div class="wrap">
+    <div class="sec-head" style="margin-bottom: 10px">
+      <div class="eyebrow">What makes it easy</div>
+      <h2 class="split">Everything you fight with in LaTeX, <span class="grad">handled.</span></h2>
+      <p class="hint">Keep scrolling →</p>
     </div>
-
-    <div class="feature reveal">
-      <div class="text">
-        <div class="eyebrow">Layout mode</div>
-        <h3>Drag anything, right on the PDF.</h3>
-        <p>Press <span class="kbd">Ctrl</span> <span class="kbd">L</span> and move charts, images and text boxes where you want them on the page. TESSA rewrites the LaTeX for you.</p>
-        <ul><li>Drag, drop and resize on the page</li><li>Works in documents and Beamer slides</li></ul>
-      </div>
-      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img class="crop" style="--y: 30%" src="assets/shot-layout.webp" alt="Dragging a chart on the PDF in layout mode" width="888" height="930" loading="lazy"></div></div>
-    </div>
-
-    <div class="feature reveal">
-      <div class="text">
-        <div class="eyebrow">Equations</div>
-        <h3>See the formula before you insert it.</h3>
-        <p>Click <b>Σ</b>, type your math and watch the preview build as you go. Inside math, shortcuts do the typing: <code>@a</code> becomes <code>\alpha</code>, <code>//</code> a fraction.</p>
-        <ul><li>Live preview and a symbol palette</li><li>Numbered, inline or aligned</li></ul>
-      </div>
-      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img class="crop" src="assets/shot-equation.webp" alt="Equation editor with live preview" width="875" height="933" loading="lazy"></div></div>
-    </div>
-
-    <div class="feature reveal">
-      <div class="text">
-        <div class="eyebrow">Tables and lists</div>
-        <h3>Edit tables like a spreadsheet.</h3>
-        <p>Paste cells from a spreadsheet and they become a LaTeX table. Click inside any table to sort, add rows or change alignment in a grid. Select lines and press <span class="kbd">Ctrl</span> <span class="kbd">K</span> to turn them into a list.</p>
-      </div>
-      <div class="shot"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/shot-table.webp" alt="Visual table editor" width="1025" height="509" loading="lazy"></div></div>
+  </div>
+  <div class="viewport" id="rideViewport">
+    <div class="track" id="rideTrack">
+      <article class="fcard">
+        <div class="text">
+          <div class="num">01 / ONE-CLICK FIXES</div>
+          <p class="hook">Forty errors and a log nobody can read?</p>
+          <h3>Errors in plain English. Then fixed.</h3>
+          <p>Every error comes with an explanation and a fix. Press <b>Fix all</b> and TESSA repairs them and compiles again. Drag the slider to see it.</p>
+          <ul><li>Misspelled commands and environments</li><li>Missing packages, braces, <code>$</code> and <code>\end{…}</code></li><li>Prices like $5, 50%, # and file paths</li></ul>
+        </div>
+        <div class="pic">
+          <div class="ba" id="ba">
+            <img src="assets/fix-after.webp" alt="After the fix: the PDF built" width="2400" height="1445" loading="lazy">
+            <img class="before" src="assets/fix-before.webp" alt="Before: an undefined control sequence with an explained one-click fix" width="2400" height="1445" loading="lazy">
+            <span class="tag l">BEFORE</span><span class="tag r">AFTER</span>
+            <div class="handle"></div>
+          </div>
+        </div>
+      </article>
+      <article class="fcard">
+        <div class="text">
+          <div class="num">02 / LAYOUT MODE</div>
+          <p class="hook">An hour of \vspace to move one figure?</p>
+          <h3>Drag anything, right on the PDF.</h3>
+          <p>Press <span class="kbd">Ctrl</span> <span class="kbd">L</span> and move charts, images and text boxes where you want them. TESSA rewrites the LaTeX for you.</p>
+          <ul><li>Drag, drop and resize on the page</li><li>Works in documents and Beamer slides</li></ul>
+        </div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/layout.webp" style="--y: 40%" alt="Dragging a chart on the PDF in layout mode" width="2160" height="2130" loading="lazy"></div></div>
+      </article>
+      <article class="fcard">
+        <div class="text">
+          <div class="num">03 / EQUATIONS</div>
+          <p class="hook">Was it \leq or \le? \frac or \dfrac?</p>
+          <h3>See the formula before you insert it.</h3>
+          <p>Click <b>Σ</b>, type your math and watch the preview build as you go. Inside math, <code>@a</code> becomes <code>\alpha</code> and <code>//</code> a fraction.</p>
+          <ul><li>Live preview and a symbol palette</li><li>Numbered, inline or aligned</li></ul>
+        </div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/equation.webp" alt="Equation editor with live preview" width="2124" height="2250" loading="lazy"></div></div>
+      </article>
+      <article class="fcard">
+        <div class="text">
+          <div class="num">04 / TABLES</div>
+          <p class="hook">Typing &amp; and \\ for forty rows?</p>
+          <h3>Edit tables like a spreadsheet.</h3>
+          <p>Paste cells from Excel and they become a booktabs table. Click inside any table to sort, add rows or change alignment in a grid.</p>
+          <ul><li>Paste from Excel, Sheets or Word</li><li>Sort, transpose, change rules</li></ul>
+        </div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/table.webp" alt="Visual table editor" width="2400" height="1209" loading="lazy"></div></div>
+      </article>
+      <article class="fcard">
+        <div class="text">
+          <div class="num">05 / COMMAND PALETTE</div>
+          <p class="hook">Where was that command again?</p>
+          <h3><span class="kbd">Ctrl</span> <span class="kbd">K</span> finds anything.</h3>
+          <p>Files, sections, labels, citations, snippets and every command, one fuzzy search away. Export to PDF, PNG or PowerPoint from the same box.</p>
+          <ul><li><code>&gt;</code> commands · <code>@</code> sections · <code>#</code> labels</li><li>Export to PowerPoint (.pptx)</li></ul>
+        </div>
+        <div class="pic"><div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/palette.webp" alt="Command palette searching export commands" width="2010" height="942" loading="lazy"></div></div>
+      </article>
     </div>
   </div>
 </section>
 
 <section class="video" id="video">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="eyebrow">Watch</div>
-      <h2>Three minutes. Every feature.</h2>
-      <p>No sign-up, no email. Just the app doing its thing.</p>
+    <div class="sec-head">
+      <p class="hook">Not convinced yet? Give it three minutes.</p>
+      <h2 class="split">Three minutes. <span class="grad">Every feature.</span></h2>
+      <p class="lead">No sign-up, no email. Just the app doing its thing.</p>
     </div>
-    <div class="player reveal">
+    <div class="player" id="player">
       <video controls preload="none" poster="assets/poster.webp" playsinline>
         <source src="assets/tessa-promo.mp4" type="video/mp4">
       </video>
@@ -331,20 +469,22 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
 
 <section id="learn">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="eyebrow">Made for beginners too</div>
-      <h2>Set up in a minute. Learn in ten.</h2>
+    <div class="sec-head">
+      <p class="hook">Never written a line of LaTeX?</p>
+      <h2 class="split">Set up in a minute. <span class="grad">Learn in ten.</span></h2>
     </div>
     <div class="duo">
-      <div class="card reveal">
+      <div class="card tilt">
+        <div class="eyebrow">First run</div>
         <h3>A setup that asks you</h3>
         <p>The first time you open TESSA it asks your name, what you write, your colours and how much help you want. Change any of it later in Settings.</p>
-        <img class="crop" src="assets/shot-setup.webp" alt="First-run setup window" width="900" height="760" loading="lazy">
+        <div class="frame"><img src="assets/setup.webp" alt="First-run setup: how much help do you want" width="2142" height="1842" loading="lazy"></div>
       </div>
-      <div class="card reveal">
-        <h3>An optional hands-on tour</h3>
+      <div class="card tilt">
+        <div class="eyebrow">Hands-on tour</div>
+        <h3>Learn by doing it</h3>
         <p>Fourteen short steps in a practice document: write, compile, equations, lists, tables, fixes and layout mode. TESSA notices when you've done each one.</p>
-        <img class="crop" style="--y: 20%" src="assets/shot-tour.webp" alt="Interactive tour panel" width="888" height="930" loading="lazy">
+        <div class="frame"><img src="assets/tour.webp" style="--y: 100%" alt="Interactive tour panel next to the PDF" width="2100" height="2208" loading="lazy"></div>
       </div>
     </div>
   </div>
@@ -352,41 +492,43 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
 
 <section class="privacy" id="privacy">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="eyebrow">Private by design</div>
-      <div class="bytes">0 bytes</div>
+    <div class="sec-head">
+      <p class="hook">Where does your thesis go when you press save?</p>
+      <div class="bytes"><span id="bytes">0</span><small>bytes</small></div>
       <h2>of your writing leave your computer.</h2>
-      <p>TESSA has no servers, no account and no analytics. It only goes online to download a LaTeX package it doesn't have yet, and never sends your documents.</p>
+      <p class="lead">TESSA has no servers, no account and no analytics. It only goes online to download a LaTeX package it doesn't have yet, and never sends your documents.</p>
     </div>
-    <div class="grid">
-      <div class="card reveal"><b>No account</b><span>Open it and start writing.</span></div>
-      <div class="card reveal"><b>Works offline</b><span>On a plane, in a lab, anywhere.</span></div>
-      <div class="card reveal"><b>Your files stay local</b><span>Projects live in your Documents folder.</span></div>
+    <div class="pgrid">
+      <div class="card tilt"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8fe3ff" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/><path d="M3 3l18 18"/></svg><b>No account</b><span>Open it and start writing.</span></div>
+      <div class="card tilt"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8fe3ff" stroke-width="1.8" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/><path d="M3 3l18 18"/></svg><b>Works offline</b><span>On a plane, in a lab, anywhere.</span></div>
+      <div class="card tilt"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8fe3ff" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><b>Your files stay local</b><span>Projects live in your Documents folder.</span></div>
     </div>
-    <p class="note">Read the full <a href="privacy.html">privacy policy</a>.</p>
+    <p class="note" style="margin-top: 26px">Read the full <a href="privacy.html">privacy policy</a>.</p>
   </div>
 </section>
 
 <section class="downloads" id="download">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="eyebrow">Version 3.0.0</div>
-      <h2>Download TESSA. It's free.</h2>
-      <p>For Windows 10 and 11. LaTeX comes built in; if you already have TeX Live or MiKTeX, TESSA uses them automatically.</p>
+    <div class="inner">
+      <div class="sec-head">
+        <div class="eyebrow">Version 3.0.0</div>
+        <h2 class="split">Your next paper <span class="grad">compiles first time.</span></h2>
+        <p class="lead">Free for Windows 10 and 11. LaTeX comes built in; if you already have TeX Live or MiKTeX, TESSA uses them automatically.</p>
+      </div>
+      <div class="dl-grid" id="dlGrid"></div>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="sumtable"><table id="sumTable"></table></div>
+        <p class="note">Open a Command Prompt in your Downloads folder and run <code>certutil -hashfile TESSA-Setup-3.0.0.exe SHA256</code>. The result must match the line above.</p>
+      </details>
+      <p class="note" style="position: relative; z-index: 1">TESSA isn't code-signed yet, so Windows may show "Windows protected your PC" the first time. Choose <b>More info → Run anyway</b>.</p>
     </div>
-    <div class="dl-grid" id="dlGrid"></div>
-    <details class="sums">
-      <summary>Verify your download (SHA-256)</summary>
-      <div class="sumtable"><table id="sumTable"></table></div>
-      <p class="note">Open a Command Prompt in your Downloads folder and run <code>certutil -hashfile TESSA-Setup-3.0.0.exe SHA256</code>. The result must match the line above.</p>
-    </details>
-    <p class="note">TESSA isn't code-signed yet, so Windows may show "Windows protected your PC" the first time. Choose <b>More info → Run anyway</b>.</p>
   </div>
 </section>
 
 <section id="faq">
   <div class="wrap">
-    <div class="sec-head reveal"><div class="eyebrow">Questions</div><h2>Good to know</h2></div>
+    <div class="sec-head"><div class="eyebrow">Questions</div><h2 class="split">Good to know</h2></div>
     <div class="faq">
       <details><summary>Is TESSA really free?</summary><p>Yes. It's free to use for personal, school and commercial writing. Everything you create belongs to you.</p></details>
       <details><summary>Do I need to install LaTeX first?</summary><p>No. TESSA ships with its own LaTeX engine and fetches packages the first time a document needs them. TeX Live or MiKTeX are used automatically if you have them.</p></details>
@@ -395,6 +537,13 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
       <details><summary>Which systems does it run on?</summary><p>Windows 10 and 11, 64-bit. Use the installer, or the portable version if you can't install software on the computer.</p></details>
       <details><summary>I'm new to LaTeX. Is it for me?</summary><p>Yes. The first-run setup tailors TESSA to beginners, and the optional 10-minute tour teaches the essentials by doing them.</p></details>
     </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <h2 class="split">Stop debugging.<br><span class="grad">Start writing.</span></h2>
+    <a class="btn primary magnet" id="closingDownload" href="#download" style="margin-top: 20px">Download TESSA, free</a>
   </div>
 </section>
 </main>
@@ -411,6 +560,7 @@ footer .email { font-family: var(--mono); color: var(--muted); user-select: all;
 
 <script>
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const narrow = () => innerWidth <= 900;
 // ---------------------------------------------------------------- downloads
 // Release files live on GitHub Releases (fast, free, and the installers are too big for the website itself).
 const RELEASE = 'https://github.com/edith-lang/tessa/releases/download/v3.0.0/';
@@ -418,37 +568,21 @@ const FILES = [
   { os: 'win', name: 'Windows installer', tag: 'Recommended', file: 'TESSA-Setup-3.0.0.exe', size: 101352228, sha: 'aebfb311d33a7c5f2c7c1e090588f8b2f68069df58996249e426aea1af57acfa', meta: 'Windows 10/11 · 64-bit · no admin rights needed' },
   { os: 'win', name: 'Windows portable', file: 'TESSA-3.0.0-portable.exe', size: 101000710, sha: 'b620e762043e0fb86c1f47b3e827e1534f2591ed7629e22715f9071493afca27', meta: 'Runs without installing' },
 ];
-const ICONS = {
-  win: '<svg width="22" height="22" viewBox="0 0 24 24" fill="#8fe3ff"><path d="M3 5.5l7.5-1v7H3zM11.5 4.3L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg>',
-};
+const WIN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#8fe3ff"><path d="M3 5.5l7.5-1v7H3zM11.5 4.3L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg>';
 const mb = b => `${Math.round(b / 1048576)} MB`;
-const mine = 'win';
 const grid = document.getElementById('dlGrid');
 for (const f of FILES) {
   const a = document.createElement('a');
-  a.className = `dl${f.os === mine && f.tag ? ' mine' : ''}`;
+  a.className = `dl${f.tag ? ' mine' : ''}`;
   a.href = RELEASE + f.file;
-  a.style.textDecoration = 'none'; a.style.color = 'inherit';
-  a.innerHTML = `<span class="os">${ICONS[f.os]}</span><span><h3>${f.name}${f.tag ? `<span class="tag">${f.tag}</span>` : ''}</h3><span class="meta">${f.meta} · ${mb(f.size)}</span></span><span class="btn ghost sm">Download</span>`;
+  a.innerHTML = `<span class="os">${WIN}</span><span><h3>${f.name}${f.tag ? `<span class="tag">${f.tag}</span>` : ''}</h3><span class="meta">${f.meta} · ${mb(f.size)}</span></span><span class="btn ${f.tag ? 'primary' : 'ghost'} sm">Download</span>`;
   grid.append(a);
 }
 document.getElementById('sumTable').innerHTML = FILES.map(f => `<tr><td>${f.file}</td><td><code>${f.sha}</code></td></tr>`).join('');
-const primary = FILES.find(f => f.os === mine && f.tag);
-const hero = document.getElementById('heroDownload');
-hero.textContent = 'Download for Windows';
-hero.href = RELEASE + primary.file;
+const primary = FILES.find(f => f.tag);
+for (const id of ['heroDownload', 'closingDownload']) document.getElementById(id).href = RELEASE + primary.file;
 
-// ---------------------------------------------------------------- reveal on scroll (content is visible without JS)
-document.documentElement.classList.add('js');
-const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove('pending'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' }) : null;
-document.querySelectorAll('.reveal').forEach(el => { if (io && el.getBoundingClientRect().top > innerHeight) { el.classList.add('pending'); io.observe(el); } });
-
-// showcase window straightens as it scrolls into view
-const win3d = document.getElementById('win3d');
-const tilt = () => { const r = win3d.getBoundingClientRect(); const p = Math.min(1, Math.max(0, (r.top - innerHeight * 0.25) / (innerHeight * 0.6))); win3d.style.setProperty('--tilt', reduce ? 0 : p.toFixed(3)); };
-addEventListener('scroll', tilt, { passive: true }); addEventListener('resize', tilt); tilt();
-
-// the fix demo
+// ---------------------------------------------------------------- the fix demo
 const demo = { cmd: document.getElementById('demoCmd'), problem: document.getElementById('demoProblem'), err: document.getElementById('demoErr'), title: document.getElementById('demoTitle'), author: document.getElementById('demoAuthor'), reset: document.getElementById('demoReset') };
 document.getElementById('demoFix').addEventListener('click', () => {
   demo.cmd.textContent = '\\title'; demo.cmd.classList.remove('typo'); demo.cmd.classList.add('fixed');
@@ -462,32 +596,146 @@ demo.reset.addEventListener('click', () => {
   demo.title.hidden = true; demo.author.hidden = true; demo.reset.hidden = true;
 });
 
-// screenshots tilt toward the pointer
-if (!reduce) document.querySelectorAll('.shot').forEach(s => {
-  const f = s.querySelector('.frame'); const base = f.style.transform;
-  s.addEventListener('pointermove', e => { const r = s.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5; const y = (e.clientY - r.top) / r.height - .5; f.style.transform = `rotateY(${x * 14}deg) rotateX(${-y * 10}deg)`; });
-  s.addEventListener('pointerleave', () => { f.style.transform = base; });
-});
+// ---------------------------------------------------------------- before / after slider
+const ba = document.getElementById('ba');
+let baTouched = false;
+const setBa = x => { const r = ba.getBoundingClientRect(); ba.style.setProperty('--p', `${Math.max(0, Math.min(100, (x - r.left) / r.width * 100))}%`); };
+ba.addEventListener('pointerdown', e => { baTouched = true; ba.setPointerCapture(e.pointerId); setBa(e.clientX); });
+ba.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'mouse') { baTouched = true; setBa(e.clientX); } });
+
+// ---------------------------------------------------------------- pointer: glow, spotlight cards, 3D tilt, magnetic buttons
+const fine = matchMedia('(pointer: fine)').matches;
+if (fine && !reduce) {
+  const glow = document.getElementById('glow');
+  addEventListener('pointermove', e => { glow.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`; }, { passive: true });
+  document.querySelectorAll('.card, .dl, .fcard').forEach(el => el.addEventListener('pointermove', e => {
+    const r = el.getBoundingClientRect(); el.style.setProperty('--mx', `${e.clientX - r.left}px`); el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  }));
+  document.querySelectorAll('.tilt').forEach(el => {
+    el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; el.style.transform = `perspective(1200px) rotateY(${x * 10}deg) rotateX(${-y * 8}deg) translateZ(10px)`; });
+    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+  });
+  document.querySelectorAll('.magnet').forEach(el => {
+    el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .25}px, ${(e.clientY - r.top - r.height / 2) * .35}px)`; });
+    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+  });
+}
 </script>
 
-<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+// ---------------------------------------------------------------- scroll choreography (skipped entirely if the libraries didn't load)
+if (window.gsap && window.ScrollTrigger && !reduce) {
+  gsap.registerPlugin(ScrollTrigger);
+  if (window.Lenis) {
+    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => { const t = document.querySelector(a.getAttribute('href')); if (t) { e.preventDefault(); lenis.scrollTo(t, { offset: -20 }); } }));
+  }
+  gsap.to('#progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
+
+  // hook: an error storm flies at you, then every error turns green and is swept away
+  const ERRS = ['! Undefined control sequence.', '! Missing $ inserted.', '! Missing } inserted.', '! LaTeX Error: File `figure1.png\' not found.', '! Extra alignment tab has been changed to \\cr.',
+    '! Environment theorem undefined.', '! Misplaced \\noalign.', '! Double subscript.', 'Overfull \\hbox (12.4pt too wide)', '! Package inputenc Error.', '! Paragraph ended before \\textbf was complete.', 'Citation `smith2021\' undefined.', '! Emergency stop.', '! Too many }\'s.'];
+  const storm = document.getElementById('storm');
+  const chips = ERRS.map((t, i) => { const s = document.createElement('span'); s.textContent = t; storm.append(s); return s; });
+  const W = innerWidth, H = innerHeight;
+  // hidden until the page (and the 3D scene) has loaded, so a busy first second can't skip the hook
+  const hookTl = gsap.timeline({ paused: true, delay: 0.2 });
+  gsap.set('.hero h1 .l1, .hero h1 .l2, .hero .lead, .hero .cta, #hookLine', { opacity: 0 });
+  let hookStarted = false;
+  const startHook = () => { if (hookStarted) return; hookStarted = true; requestAnimationFrame(() => requestAnimationFrame(() => hookTl.play())); };
+  addEventListener('load', () => setTimeout(startHook, 150));
+  setTimeout(startHook, 4000);
+  hookTl.fromTo('#hookLine', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .6 })
+    .fromTo(chips, { opacity: 0, x: () => gsap.utils.random(-W * .5, W * .5) - 140, y: () => gsap.utils.random(-H * .42, H * .42), z: -1400, rotateX: () => gsap.utils.random(-50, 50), rotateY: () => gsap.utils.random(-60, 60) },
+      { opacity: 1, z: () => gsap.utils.random(-300, 120), rotateX: () => gsap.utils.random(-12, 12), rotateY: () => gsap.utils.random(-18, 18), duration: 1.1, ease: 'power3.out', stagger: .07 }, '<.1')
+    .add(() => chips.forEach(c => c.classList.add('fixed')), '+=.35')
+    .to(chips, { opacity: 0, z: 500, y: '-=60', duration: .7, ease: 'power2.in', stagger: .03 }, '+=.35')
+    .fromTo('.hero h1 .l1, .hero h1 .l2', { yPercent: 110, opacity: 0, rotateX: -60, transformOrigin: '50% 100%' }, { yPercent: 0, opacity: 1, rotateX: 0, duration: 1, ease: 'expo.out', stagger: .12 }, '-=.5')
+    .fromTo('.hero .lead, .hero .cta', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .8, stagger: .1 }, '-=.6')
+    .add(() => window.dispatchEvent(new Event('tessa:assemble')), '-=1.4');
+
+  // split headings: words rise out of a mask
+  document.querySelectorAll('.split').forEach(h => {
+    const walk = n => [...n.childNodes].forEach(c => {
+      if (c.nodeType === 3) { const f = document.createDocumentFragment(); c.textContent.split(/(\s+)/).forEach(w => { if (!w.trim()) { f.append(w); return; } const o = document.createElement('span'); o.className = 'w'; const i = document.createElement('span'); i.textContent = w; o.append(i); f.append(o); }); c.replaceWith(f); }
+      else if (c.nodeType === 1 && c.tagName !== 'BR') walk(c);
+    });
+    walk(h);
+    gsap.from(h.querySelectorAll('.w > span'), { yPercent: 115, rotate: 6, duration: 1, ease: 'expo.out', stagger: .045, scrollTrigger: { trigger: h, start: 'top 85%' } });
+  });
+  gsap.utils.toArray('.sec-head .hook, .sec-head .lead, .sec-head .eyebrow').forEach(el => gsap.from(el, { opacity: 0, y: 20, duration: .8, scrollTrigger: { trigger: el, start: 'top 90%' } }));
+
+  // counters
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const end = +el.dataset.count, dec = +(el.dataset.dec || 0), suf = el.dataset.suffix || ''; const o = { v: end ? 0 : 99 };
+    gsap.to(o, { v: end, duration: 1.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 90%' }, onUpdate: () => { el.textContent = o.v.toFixed(dec) + suf; } });
+  });
+
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 901px)', () => {
+    // the hero copy drifts away in depth as you scroll on
+    gsap.to('.hero .copy', { yPercent: -30, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+    // exploded app: lies back in space, stands up and its panels lift off towards you
+    const tl = gsap.timeline({ scrollTrigger: { trigger: '#explodeStage', start: 'top 85%', end: 'center 45%', scrub: 1 } });
+    tl.to('#explodeScene', { rotateX: 0, rotateZ: 0, scale: 1, ease: 'none' })
+      .fromTo('.float', { z: 0, opacity: 0, scale: .6 }, { z: (i, el) => +el.dataset.z, opacity: 1, scale: 1, ease: 'none', stagger: .05 }, 0);
+    gsap.to('.float', { y: (i) => [-30, 24, -18, 30][i], ease: 'none', scrollTrigger: { trigger: '#explodeStage', start: 'center center', end: 'bottom top', scrub: 1 } });
+
+    // the feature ride: pinned, slides sideways; each card swings in 3D by its distance from the centre
+    const track = document.getElementById('rideTrack');
+    const cards = gsap.utils.toArray('.fcard');
+    const shift = () => -(track.scrollWidth - innerWidth);
+    const swing = () => { const c = innerWidth / 2; cards.forEach(el => { const r = el.getBoundingClientRect(); const d = (r.left + r.width / 2 - c) / innerWidth; gsap.set(el, { rotateY: d * -38, z: -Math.abs(d) * 320, opacity: 1 - Math.min(.55, Math.abs(d) * .7) }); }); };
+    gsap.to(track, { x: shift, ease: 'none', scrollTrigger: { trigger: '#ride', start: 'top top', end: () => '+=' + (-shift()), pin: '#ride', pinSpacing: true, scrub: 1, invalidateOnRefresh: true, onUpdate: swing, onRefresh: swing } });
+    swing();
+
+    // the video tilts up into place
+    gsap.to('#player', { rotateX: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '#player', start: 'top 95%', end: 'center 60%', scrub: 1 } });
+  });
+
+  // before/after sweeps by itself until someone touches it
+  const sweep = { p: 82 };
+  const sweepTw = gsap.to(sweep, { p: 18, duration: 1.8, ease: 'sine.inOut', yoyo: true, repeat: -1, repeatDelay: .6,
+    onUpdate: () => { if (baTouched) sweepTw.kill(); else ba.style.setProperty('--p', sweep.p + '%'); } });
+
+  // privacy: a whole thesis worth of bytes counts down to nothing
+  const bytes = document.getElementById('bytes'); const bo = { v: 48213504 };
+  gsap.to(bo, { v: 0, duration: 2.6, ease: 'power3.inOut', scrollTrigger: { trigger: bytes, start: 'top 80%' }, onUpdate: () => { bytes.textContent = Math.round(bo.v).toLocaleString('en-US'); } });
+
+  gsap.utils.toArray('.pgrid .card, .duo .card, .dl, .faq details').forEach((el, i) => gsap.from(el, { opacity: 0, y: 50, rotateX: -18, transformOrigin: '50% 0%', duration: .9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 92%' } }));
+  addEventListener('load', () => ScrollTrigger.refresh());
+} else {
+  window.addEventListener('DOMContentLoaded', () => window.dispatchEvent(new Event('tessa:assemble')));
+}
+</script>
+
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
-// ---------------------------------------------------------------- 3D hero: the TESSA mosaic T as glass-like tiles
+// ---------------------------------------------------------------- 3D hero: the TESSA mosaic T in glass tiles, an orbiting ring of shards, bloom
 import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 const canvas = document.getElementById('stage');
-const showFallback = () => { canvas.remove(); document.getElementById('fallbackLogo').hidden = false; };
 let renderer;
-try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); } catch { showFallback(); }
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch { canvas.remove(); }
 if (renderer) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.85;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95;
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#07081a');
+  scene.fog = new THREE.FogExp2('#07081a', 0.035);
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-  camera.position.set(0, 0, 13);
+  camera.position.set(0, 0, 14);
 
-  // same construction as the logo: equilateral grid, half tiles at the edges, s = 1 unit
+  // same construction as the logo: equilateral grid, half tiles at the edges
   const s = 1, h = Math.sqrt(3) / 2;
   const tris = [];
   const tri = (row, pts, kind) => tris.push({ row, kind, pts: pts.map(([u, r]) => [u * s - 2.5, -(r * h) + 2 * h]) });
@@ -504,78 +752,110 @@ if (renderer) {
   }
   const cursor = tris.findIndex(t => t.row === 3 && t.kind === 'u');
 
-  const group = new THREE.Group(); scene.add(group);
+  const world = new THREE.Group(); scene.add(world);
+  const group = new THREE.Group(); world.add(group);
   const rnd = (a, b) => a + Math.random() * (b - a);
   const tiles = tris.map((t, i) => {
     const c = t.pts.reduce((acc, p) => [acc[0] + p[0] / 3, acc[1] + p[1] / 3], [0, 0]);
-    // each tile slightly smaller than its cell, so dark seams show between them like in the logo
     const shape = new THREE.Shape(t.pts.map(([x, y]) => new THREE.Vector2((x - c[0]) * 0.86, (y - c[1]) * 0.86)));
     const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.34, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.045, bevelSegments: 3 });
     geo.translate(0, 0, -0.17);
     const light = 1 - t.row * 0.09 - ((c[0] + 2.5) / 5) * 0.18 - (t.kind === 'u' ? 0.16 : t.kind === 'h' ? 0.08 : 0);
     const col = i === cursor ? new THREE.Color('#8fe3ff') : new THREE.Color('#4a3cc4').lerp(new THREE.Color('#f4f2ff'), Math.max(0.3, light * 0.92));
-    const mat = new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.22, metalness: 0.08, clearcoat: 1, clearcoatRoughness: 0.15, emissive: i === cursor ? new THREE.Color('#2bb6e6') : new THREE.Color('#000000'), emissiveIntensity: i === cursor ? 0.9 : 0 });
+    const mat = new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.18, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.1, iridescence: 0.6, iridescenceIOR: 1.4, emissive: i === cursor ? new THREE.Color('#2bb6e6') : new THREE.Color('#000'), emissiveIntensity: i === cursor ? 2.2 : 0 });
     const m = new THREE.Mesh(geo, mat);
     const home = new THREE.Vector3(c[0], c[1], 0);
     const dir = new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-0.6, 1)).normalize();
-    const away = home.clone().add(dir.multiplyScalar(rnd(4, 8)));
-    const spin = new THREE.Euler(rnd(-3, 3), rnd(-3, 3), rnd(-3, 3));
+    const away = home.clone().add(dir.multiplyScalar(rnd(5, 10)));
+    m.position.copy(away);
     group.add(m);
-    return { m, home, away, spin, delay: rnd(0, 0.5) };
+    return { m, home, away, spin: new THREE.Euler(rnd(-4, 4), rnd(-4, 4), rnd(-4, 4)), delay: rnd(0, 0.6) };
   });
 
-  // a field of faint triangles drifting behind
+  // a tilted ring of tiny glowing shards orbiting the T
+  const N = 700;
+  const shard = new THREE.TetrahedronGeometry(0.05);
+  const ring = new THREE.InstancedMesh(shard, new THREE.MeshBasicMaterial({ color: '#ffffff' }), N);
+  const dummy = new THREE.Object3D(); const ringData = [];
+  const palette = [new THREE.Color('#8fe3ff'), new THREE.Color('#7b6cff'), new THREE.Color('#a99cff'), new THREE.Color('#f0a04b')];
+  for (let i = 0; i < N; i++) {
+    const r = rnd(4.2, 6.4), a = rnd(0, Math.PI * 2), y = rnd(-0.35, 0.35) * (1 + (r - 4.2));
+    ringData.push({ r, a, y, sp: rnd(0.04, 0.12) * (r < 5 ? 1.3 : 1), s: rnd(0.5, 1.8) });
+    ring.setColorAt(i, palette[i % 9 === 0 ? 3 : i % 3].clone().multiplyScalar(rnd(1, 2.2)));
+  }
+  ring.rotation.set(1.15, 0.2, -0.35);
+  group.add(ring);
+
+  // deep field of drifting triangles
   const dust = new THREE.Group(); scene.add(dust);
   const dGeo = new THREE.CircleGeometry(0.06, 3);
-  for (let k = 0; k < 140; k++) {
-    const d = new THREE.Mesh(dGeo, new THREE.MeshBasicMaterial({ color: k % 5 ? '#6b63c9' : '#8fe3ff', transparent: true, opacity: rnd(0.15, 0.55) }));
-    d.position.set(rnd(-14, 14), rnd(-8, 8), rnd(-12, -2)); d.rotation.z = rnd(0, 6);
+  for (let k = 0; k < 220; k++) {
+    const d = new THREE.Mesh(dGeo, new THREE.MeshBasicMaterial({ color: k % 5 ? '#6b63c9' : '#8fe3ff', transparent: true, opacity: rnd(0.2, 0.7) }));
+    d.position.set(rnd(-18, 18), rnd(-10, 10), rnd(-20, -2)); d.rotation.z = rnd(0, 6);
     dust.add(d);
   }
 
-  scene.add(new THREE.HemisphereLight('#b9b2ff', '#0d0b2a', 0.55));
-  const key = new THREE.DirectionalLight('#ffffff', 1.5); key.position.set(-4, 6, 8); scene.add(key);
-  const rim = new THREE.PointLight('#8fe3ff', 40, 30); rim.position.set(5, -3, 4); scene.add(rim);
-  const fill = new THREE.PointLight('#7d6bff', 30, 30); fill.position.set(-6, -2, 3); scene.add(fill);
+  scene.add(new THREE.HemisphereLight('#b9b2ff', '#0d0b2a', 0.7));
+  const key = new THREE.DirectionalLight('#ffffff', 1.8); key.position.set(-4, 6, 8); scene.add(key);
+  const rim = new THREE.PointLight('#8fe3ff', 60, 30); rim.position.set(5, -3, 4); scene.add(rim);
+  const fill = new THREE.PointLight('#7d6bff', 45, 30); fill.position.set(-6, -2, 3); scene.add(fill);
+  const roam = new THREE.PointLight('#f0a04b', 25, 12); scene.add(roam);
 
-  const pointer = { x: 0, y: 0 }; const target = { x: 0, y: 0 };
-  addEventListener('pointermove', e => { target.x = e.clientX / innerWidth - 0.5; target.y = e.clientY / innerHeight - 0.5; });
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.75, 0.6, 0.72);
+  composer.addPass(bloom); composer.addPass(new OutputPass());
 
+  const pointer = { x: 0, y: 0 }, target = { x: 0, y: 0 };
+  addEventListener('pointermove', e => { target.x = e.clientX / innerWidth - 0.5; target.y = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+  let narrowView = false;
   const resize = () => {
     const w = canvas.clientWidth, hgt = canvas.clientHeight;
-    renderer.setSize(w, hgt, false);
+    renderer.setSize(w, hgt, false); composer.setSize(w, hgt); bloom.setSize(w, hgt);
     camera.aspect = w / hgt; camera.updateProjectionMatrix();
-    const narrow = w < 900;
+    narrowView = w < 900;
     const unitsPerPx = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / hgt;
-    // on phones the canvas is only the 300 px band under the copy (see CSS), so the T sits in its middle
-    group.position.set(narrow ? 0 : 3.1, 0, 0);
-    // the T is 5 units wide: on phones keep it to ~60% of the screen width
-    group.scale.setScalar(narrow ? Math.min(0.62, (w * 0.6 * unitsPerPx) / 5, (hgt * 0.75 * unitsPerPx) / 5) : 0.95);
+    world.position.set(narrowView ? 0 : 3.3, 0.2, 0);
+    // phones: the canvas is the band under the copy (CSS); keep the T and its ring inside it
+    world.scale.setScalar(narrowView ? Math.min(0.5, (w * 0.42 * unitsPerPx) / 6.4, (hgt * 0.42 * unitsPerPx) / 6.4) : Math.min(0.8, (w * 0.3 * unitsPerPx) / 6.4));
   };
   addEventListener('resize', resize); resize();
 
-  const t0 = performance.now();
+  let tAsm = reduce ? -10 : null;
+  window.addEventListener('tessa:assemble', () => { if (tAsm === null) tAsm = performance.now() / 1000; });
+  setTimeout(() => { if (tAsm === null) tAsm = performance.now() / 1000; }, 7000);
   const ease = x => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
   let visible = true;
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
-  const frame = now => {
+  const t0 = performance.now() / 1000;
+  const frame = () => {
     requestAnimationFrame(frame);
     if (!visible) return;
-    const t = (now - t0) / 1000;
-    // tiles assemble on load, and drift apart again as the hero scrolls away
-    const scroll = Math.min(1, Math.max(0, scrollY / (canvas.clientHeight * 0.9)));
+    const now = performance.now() / 1000, t = now - t0;
+    // how far the canvas itself has scrolled off the top (on phones it sits below the copy, so it explodes only once you're past it)
+    const cr = canvas.getBoundingClientRect();
+    const scroll = Math.min(1, Math.max(0, -cr.top / (cr.height * 0.9)));
     pointer.x += (target.x - pointer.x) * 0.05; pointer.y += (target.y - pointer.y) * 0.05;
     for (const tl of tiles) {
-      const asm = reduce ? 1 : ease((t - 0.2 - tl.delay) / 1.6) * (1 - ease(scroll * 1.3));
+      const asm = tAsm === null ? 0 : ease((now - tAsm - tl.delay) / 1.5) * (1 - ease(scroll * 1.25));
       tl.m.position.lerpVectors(tl.away, tl.home, asm);
       tl.m.rotation.set(tl.spin.x * (1 - asm), tl.spin.y * (1 - asm), tl.spin.z * (1 - asm));
     }
-    const idle = reduce ? 0 : Math.sin(t * 0.6) * 0.06;
-    group.rotation.y = -0.35 + pointer.x * 0.7 + idle;
-    group.rotation.x = 0.12 + pointer.y * 0.45;
-    dust.rotation.z = reduce ? 0 : t * 0.01;
-    dust.position.y = scroll * 2;
-    renderer.render(scene, camera);
+    for (let i = 0; i < N; i++) {
+      const d = ringData[i]; const a = d.a + (reduce ? 0 : t * d.sp);
+      dummy.position.set(Math.cos(a) * d.r, d.y, Math.sin(a) * d.r);
+      dummy.rotation.set(a * 3, a * 2, 0); dummy.scale.setScalar(d.s * (1 + scroll * 2));
+      dummy.updateMatrix(); ring.setMatrixAt(i, dummy.matrix);
+    }
+    ring.instanceMatrix.needsUpdate = true;
+    const idle = reduce ? 0 : Math.sin(t * 0.6) * 0.08;
+    group.rotation.y = -0.35 + pointer.x * 0.8 + idle;
+    group.rotation.x = 0.12 + pointer.y * 0.5;
+    roam.position.set(Math.cos(t * 0.7) * 4, Math.sin(t * 0.9) * 2.5, 3);
+    camera.position.z = 14 - scroll * 5; camera.position.y = -scroll * 1.2;
+    dust.rotation.z = reduce ? 0 : t * 0.012; dust.position.y = scroll * 3;
+    composer.render();
   };
   requestAnimationFrame(frame);
 }
